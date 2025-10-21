@@ -4,6 +4,8 @@ project(QtUSB)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(MSVC)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
@@ -15,3 +17,5 @@ find_library(USB_LIB NAMES libusb-1.0 usb-1.0)
 if (NOT USB_LIB)
     message(FATAL_ERROR "can`t find libusb")
 endif ()
+
+add_subdirectory(example)
