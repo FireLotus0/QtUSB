@@ -12,7 +12,7 @@ void UsbListener::listen() {
             emit deviceChanged(tmpDevices);
         } else if(devCount != devices.data.size()) {
             isInsert = devCount > devices.data.size();
-            if(isInsert) {
+            // if(isInsert) {
                 for (int i = 0; i < devCount; i++) {
                     // 获取PID，VID
                     auto ret = libusb_get_device_descriptor(devLists[i], &deviceDescriptor);
