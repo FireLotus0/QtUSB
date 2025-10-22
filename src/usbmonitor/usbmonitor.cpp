@@ -1,6 +1,7 @@
 #include "usbmonitor.h"
-#include "src/usbmonitor/impl/monitorthreaded.h"
 #include "src/libusb.h"
+#include "src/usbmonitor/impl/monitorthreaded.h"
+#include "src/usbmonitor/impl/monitorhotplug.h"
 
 QT_USB_NAMESPACE_BEGIN
 
@@ -8,6 +9,7 @@ UsbMonitor::UsbMonitor(QObject *parent)
         : QObject(parent)
 {
     initMonitor();
+    qRegisterMetaType<UsbId>("UsbId");
 }
 
 UsbMonitor &UsbMonitor::instance() {
@@ -25,7 +27,7 @@ void UsbMonitor::stop() {
 
 void UsbMonitor::initMonitor() {
     if(libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
-
+        monitor = new MonitorHotplug(this);
     } else {
         monitor = new MonitorThreaded(this);
     }

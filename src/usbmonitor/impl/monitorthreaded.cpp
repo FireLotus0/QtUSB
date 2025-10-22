@@ -72,7 +72,7 @@ void MonitorWorker::onStartMonitor() {
         for(auto id : searchCache.keys()) {
             if(!searchCache[id] && monitorIds[id]) {
                 monitorIds[id] = false;
-                UsbMonitor::instance().deviceAttached(id);
+                UsbMonitor::instance().deviceDetached(id);
             }
         }
         libusb_free_device_list(devLists, 1);
@@ -94,7 +94,7 @@ void MonitorWorker::updateMonitorIds() {
     if (!addCache.isEmpty()) {
         for (const auto &addId: addCache) {
             if (!monitorIds.contains(addId)) {
-                monitorIds[addId] = true;
+                monitorIds[addId] = false;
             }
         }
         addCache.clear();

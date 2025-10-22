@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qmetatype.h>
+
 #include "src/usb_namespace.h"
 #include <QtGlobal>
 
@@ -17,3 +19,5 @@ struct UsbId {
 };
 
 QT_USB_NAMESPACE_END
+
+Q_DECLARE_METATYPE(QT_USB::UsbId)

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         qDebug() << "device detached: " << id;
     });
 
-//    UsbMonitor::instance().start();
+    UsbMonitor::instance().start();
     QTimer timer;
     timer.setInterval(500);
     timer.callOnTimeout([&]{

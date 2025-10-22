@@ -15,6 +15,13 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorbase.cpp
     ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorthreaded.h
     ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorthreaded.cpp
+    ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorhotplug.h
+    ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorhotplug.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/configuration/configdesc.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/configuration/configdesc.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
