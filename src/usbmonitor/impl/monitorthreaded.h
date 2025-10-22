@@ -4,8 +4,9 @@
 #include <qobject.h>
 #include <qthread.h>
 #include <qmutex.h>
+#include <qmap.h>
 
-#include "usbmanager/libusb.h"
+#include "src/libusb.h"
 
 QT_USB_NAMESPACE_BEGIN
 class MonitorWorker;
@@ -47,12 +48,14 @@ private slots:
 
 private:
     void updateMonitorIds();
-
 private:
+    UsbId usbIdTemp;
     libusb_device **devLists;
     QAtomicInt &workerEnable;
     QAtomicInt &monitorFlag;
-    QList<UsbId> monitorIds, addCache, removeCache, searchCache;
+    libusb_device_descriptor descriptor;
+    QList<UsbId>  addCache, removeCache;
+    QMap<UsbId, bool> monitorIds, searchCache;
 };
 
 QT_USB_NAMESPACE_END

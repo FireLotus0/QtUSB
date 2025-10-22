@@ -1,36 +1,48 @@
+#include "src/usbmonitor/usbmonitor.h"
+#include "src/libusb.h"
+
 #include <qdebug.h>
 #include <qcoreapplication.h>
 #include <qthread.h>
 #include <qtimer.h>
 
+USING_QT_USB_NAMESPACE
+
 class Test : public QObject {
     Q_OBJECT
 public:
-    static Test& instance() {
-        static Test instance;
-        return instance;
-    }
-private:
     Test(QObject *parent = nullptr) : QObject(parent) {}
 
-signals:
-    void triggered();
+public slots:
+    void onDevAttached(UsbId id) {
+
+    };
+
+    void onDevLeft(UsbId id) {
+        qDebug() << "device detached: " << id;
+    }
 };
 
 int main(int argc, char *argv[]) {
     QCoreApplication application(argc, argv);
-
-    QObject::connect(&Test::instance(), &Test::triggered, [&]() {
-        qDebug() << "triggered";
-    });
-    auto thread = QThread::create([] {
-           Test::instance().triggered();
-       });
-    QTimer::singleShot(100, [&]() {
-        thread->start();
+    libusb_init_context(NULL, NULL, 0);
+    QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceAttached, [&](UsbId id) {
+        qDebug() << "device attached: " << id;
     });
 
+    QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceDetached, [&](UsbId id) {
+        qDebug() << "device detached: " << id;
+    });
+
+//    UsbMonitor::instance().start();
+    QTimer timer;
+    timer.setInterval(500);
+    timer.callOnTimeout([&]{
+        UsbMonitor::instance().addMonitorId({0x4831, 0x4831});
+    });
+    timer.start();
     application.exec();
+    libusb_exit(NULL);
 }
 
 #include "main.moc"

@@ -9,9 +9,11 @@ struct UsbId {
     quint16 pid;
     quint16 vid;
 
-    bool operator==(const UsbId &other) const {
-        return pid == other.pid && vid == other.vid;
-    }
+    bool operator==(const UsbId &other) const;
+
+    bool operator<(const UsbId& other) const;
+
+    friend QDebug& operator<<(QDebug& out, const UsbId& data);
 };
 
 QT_USB_NAMESPACE_END
