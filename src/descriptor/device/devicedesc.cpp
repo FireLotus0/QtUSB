@@ -3,7 +3,10 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-DeviceDesc::DeviceDesc(libusb_device *device) : DescriptorBase(device) {
+DeviceDesc::DeviceDesc(libusb_device *device, DescriptorData* descriptorData)
+    : DescriptorBase(device)
+    , descriptorData(descriptorData)
+{
     descriptorType = DescriptorType::DEVICE_DESCRIPTOR;
     printPrefix = QString(static_cast<int>(descriptorType), ' ');
 }
@@ -23,7 +26,7 @@ void DeviceDesc::resolveInfo() {
         content += genContentLine("Device Speed: ", (devSpeedInfo.contains(speed) ? devSpeedInfo[speed] : "Unknown Speed"));
         content += genContentLine("Possible Configurations: ", QString::number(desc.bNumConfigurations));
         for(int i= 0; i < desc.bNumConfigurations; i++) {
-            auto child = new ConfigDesc(device, i);
+            auto child = new ConfigDesc(device, i, descriptorData);
             child->resolveInfo();
             children.append(child);
         }

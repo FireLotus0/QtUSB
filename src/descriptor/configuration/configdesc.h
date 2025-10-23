@@ -3,15 +3,15 @@
 #include <qvector.h>
 
 QT_USB_NAMESPACE_BEGIN
-class ConfigDesc : public DescriptorBase
-{
+class ConfigDesc : public DescriptorBase {
 public:
-    ConfigDesc(libusb_device* device, int index);
+    ConfigDesc(libusb_device *device, int index, DescriptorData *descriptorData);
 
     void resolveInfo() override;
 
 private:
-    libusb_config_descriptor* desc;
+    libusb_config_descriptor *desc;
+    DescriptorData *descriptorData;
     int configIndex;
 };
 

@@ -4,20 +4,16 @@
 QT_USB_NAMESPACE_BEGIN
 UsbDescriptor::UsbDescriptor(libusb_device *device, QObject *parent)
 {
-    descriptor = new DeviceDesc(device);
+    descriptor = new DeviceDesc(device, &descriptorData);
     descriptor->resolveInfo();
-}
-
-UsbDescriptor::~UsbDescriptor() {
+    configInfo = descriptor->getContent();
+    descriptor->releaseChildren();
     delete descriptor;
+    descriptor = nullptr;
 }
 
-void UsbDescriptor::printInfo() {
-    if(descriptor) {
-        descriptor->printInfo();
-    } else {
-        qWarning() << "Descriptor is not created yet!";
-    }
+void UsbDescriptor::printInfo() const {
+    qInfo().noquote() << configInfo;
 }
 
 

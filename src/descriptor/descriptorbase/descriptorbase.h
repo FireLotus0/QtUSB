@@ -5,8 +5,9 @@
 #include <qstring.h>
 #include <qdebug.h>
 
-QT_USB_NAMESPACE_BEGIN
+#include "descriptordata.h"
 
+QT_USB_NAMESPACE_BEGIN
 #define DESCRIPTOR_DESCRIPTION(code, description) std::pair<uint8_t, QString>(code, description)
 
 enum class DescriptorType {
@@ -23,17 +24,19 @@ public:
 
     virtual ~DescriptorBase();
 
-    virtual void resolveInfo();
+    virtual void resolveInfo() = 0;
 
     void printInfo() const;
+
+    void releaseChildren();
+
+    QString getContent() const;
 
 protected:
     template<typename...Args>
     QString genContentLine(Args&&...args) {
         return (printPrefix + ... + args) + "\n";
     }
-
-    QString getContent() const;
 
 protected:
     QString content{};

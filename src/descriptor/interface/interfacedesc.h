@@ -3,14 +3,14 @@
 #include <qvector.h>
 
 QT_USB_NAMESPACE_BEGIN
-class InterfaceDesc : public DescriptorBase
-{
+class InterfaceDesc : public DescriptorBase {
 public:
-    InterfaceDesc(libusb_device* device, libusb_interface interface, int index);
+    InterfaceDesc(libusb_device *device, libusb_interface interface, int index, ConfigurationData *configurationData);
 
     void resolveInfo() override;
 
 private:
+    ConfigurationData *configurationData;
     libusb_interface interface;
     int interfaceIndex;
 };

@@ -20,6 +20,8 @@ add_executable(${PROJECT_NAME}
 
     ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptordata.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptordata.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/device/devicedesc.h

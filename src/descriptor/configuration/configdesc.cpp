@@ -2,9 +2,10 @@
 #include "src/descriptor/interface/interfacedesc.h"
 QT_USB_NAMESPACE_BEGIN
 
-QT_USB::ConfigDesc::ConfigDesc(libusb_device *device, int index)
+ConfigDesc::ConfigDesc(libusb_device *device, int index, DescriptorData* descriptorData)
     : DescriptorBase(device)
     , configIndex(index)
+    , descriptorData(descriptorData)
 {
     descriptorType = DescriptorType::CONFIGURATION_DESCRIPTOR;
     printPrefix = QString(static_cast<int>(descriptorType), ' ');
@@ -22,7 +23,10 @@ void ConfigDesc::resolveInfo() {
         content += genContentLine("Configuration #", QString::number(configIndex), " ID=", QString::number(desc->bConfigurationValue));
         content += genContentLine("Interface Counts: ", QString::number(desc->bNumInterfaces));
         for(int i = 0; i < desc->bNumInterfaces; i++) {
-            auto interface = new InterfaceDesc(device, desc->interface[i], i);
+            ConfigurationData configurationData;
+            configurationData.configurationValue = desc->bConfigurationValue;
+            descriptorData->configurations.insert(desc->bConfigurationValue, configurationData);
+            auto interface = new InterfaceDesc(device, desc->interface[i], i, &configurationData);
             interface->resolveInfo();
             children.append(interface);
         }
