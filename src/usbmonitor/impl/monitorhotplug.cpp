@@ -42,7 +42,7 @@ int hotplugCallback(libusb_context *context, libusb_device *dev, libusb_hotplug_
     libusb_get_device_descriptor(dev, &desc);
     if (*((QAtomicInt*)user_data) == 1) {
         if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
-            UsbMonitor::instance().deviceAttached({desc.idProduct, desc.idVendor});
+            UsbMonitor::instance().deviceAttached({desc.idProduct, desc.idVendor}, {dev});
         } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
             UsbMonitor::instance().deviceDetached({desc.idProduct, desc.idVendor});
         } else {

@@ -1,18 +1,19 @@
 #pragma once
+
 #include "src/descriptor/descriptorbase/descriptorbase.h"
 #include <qvector.h>
 
 QT_USB_NAMESPACE_BEGIN
-class ConfigDesc : public DescriptorBase
+class InterfaceAlter : public DescriptorBase
 {
 public:
-    ConfigDesc(libusb_device* device, int index);
+    InterfaceAlter(libusb_device* device, libusb_interface_descriptor interfaceDesc);
 
     void resolveInfo() override;
 
 private:
-    libusb_config_descriptor* desc;
-    int configIndex;
+    libusb_interface_descriptor desc;
 };
 
 QT_USB_NAMESPACE_END
+

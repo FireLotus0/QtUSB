@@ -18,10 +18,20 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorhotplug.h
     ${CMAKE_SOURCE_DIR}/src/usbmonitor/impl/monitorhotplug.cpp
 
-    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase.h
-    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/device/devicedesc.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/device/devicedesc.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/configuration/configdesc.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/configuration/configdesc.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/interface/interfacedesc.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/interface/interfacedesc.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/interface/interfacealter.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/interface/interfacealter.cpp
+    ${CMAKE_SOURCE_DIR}/src/descriptor/endpoint/endpointdesc.h
+    ${CMAKE_SOURCE_DIR}/src/descriptor/endpoint/endpointdesc.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

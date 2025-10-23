@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/datatypes.h"
+#include "src/libusb.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -21,7 +22,7 @@ public:
     void stop();
 
 signals:
-    void deviceAttached(UsbId id);
+    void deviceAttached(UsbId id, LibUsbDevWrap device);
     void deviceDetached(UsbId id);
 
 private:

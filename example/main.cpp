@@ -1,5 +1,5 @@
 #include "src/usbmonitor/usbmonitor.h"
-#include "src/libusb.h"
+#include "src/descriptor/usbdescriptor.h"
 
 #include <qdebug.h>
 #include <qcoreapplication.h>
@@ -25,9 +25,12 @@ public slots:
 
 int main(int argc, char *argv[]) {
     QCoreApplication application(argc, argv);
+
     libusb_init_context(NULL, NULL, 0);
-    QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceAttached, [&](UsbId id) {
+    QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceAttached, [&](UsbId id, LibUsbDevWrap dev) {
         qDebug() << "device attached: " << id;
+        UsbDescriptor descriptor(dev.device);
+        descriptor.printInfo();
     });
 
     QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceDetached, [&](UsbId id) {

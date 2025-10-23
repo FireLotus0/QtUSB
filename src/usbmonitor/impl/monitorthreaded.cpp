@@ -62,7 +62,7 @@ void MonitorWorker::onStartMonitor() {
                     searchCache[usbIdTemp] = true;
                     if(!monitorIds[usbIdTemp]) {
                         monitorIds[usbIdTemp] = true;
-                        UsbMonitor::instance().deviceAttached(usbIdTemp);
+                        UsbMonitor::instance().deviceAttached(usbIdTemp, {devLists[i]});
                     }
                 }
             } else {

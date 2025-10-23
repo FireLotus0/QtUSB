@@ -3,6 +3,7 @@
 #include <qmetatype.h>
 
 #include "src/usb_namespace.h"
+#include "libusb.h"
 #include <QtGlobal>
 
 QT_USB_NAMESPACE_BEGIN
@@ -18,6 +19,11 @@ struct UsbId {
     friend QDebug& operator<<(QDebug& out, const UsbId& data);
 };
 
+struct LibUsbDevWrap {
+    libusb_device* device;
+};
+
 QT_USB_NAMESPACE_END
 
 Q_DECLARE_METATYPE(QT_USB::UsbId)
+Q_DECLARE_METATYPE(QT_USB::LibUsbDevWrap)
