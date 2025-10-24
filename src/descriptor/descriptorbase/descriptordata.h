@@ -1,24 +1,10 @@
 #pragma once
 
 #include "src/usb_namespace.h"
+#include "src/datatypes.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN
-
-enum class TransferType {
-    CONTROL = 0,
-    SYNC,
-    BULK,
-    INTERRUPT,
-};
-
-QString transferTypeToString(TransferType t);
-
-enum class TransferDirection {
-    HOST_TO_DEVICE = 0,
-    DEVICE_TO_HOST,
-};
-QString transferDirectionToString(TransferDirection d);
 
 struct EndPointData {
     quint8 address;
@@ -26,7 +12,10 @@ struct EndPointData {
     TransferDirection direction;
     uint16_t maxPacketSize;
 
-    bool operator==(const EndPointData &other) const;
+    bool operator==(const EndPointData &other) const {
+        return direction == other.direction && maxPacketSize == other.maxPacketSize
+               && transferType == other.transferType && address == other.address;
+    }
 };
 
 struct InterfaceData {
@@ -40,12 +29,14 @@ struct ConfigurationData {
 };
 
 struct DescriptorData {
+    bool fullDuplexSupported{false};
     QMap<quint8, ConfigurationData> configurations;
 };
 
 struct ActiveUSBConfig {
     quint8 configuration = 0xFF;
     quint8 interface = 0xFF;
+    uint8_t pointNumber = 0xFF;
 };
 
 QT_USB_NAMESPACE_END

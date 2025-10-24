@@ -21,7 +21,6 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/usbdescriptor.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptordata.h
-    ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptordata.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/descriptorbase/descriptorbase.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/device/devicedesc.h
@@ -34,6 +33,23 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/descriptor/interface/interfacealter.cpp
     ${CMAKE_SOURCE_DIR}/src/descriptor/endpoint/endpointdesc.h
     ${CMAKE_SOURCE_DIR}/src/descriptor/endpoint/endpointdesc.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/transfer/transfercontext.h
+    ${CMAKE_SOURCE_DIR}/src/transfer/transfercontext.cpp
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/strategybase.h
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/strategybase.cpp
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/bulk/syncbulktransfer.h
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/bulk/syncbulktransfer.cpp
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/control/synccontroltransfer.h
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/control/synccontroltransfer.cpp
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/interrupt/syncintertransfer.h
+    ${CMAKE_SOURCE_DIR}/src/transfer/impl/sync/interrupt/syncintertransfer.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/iocommand/iocommand.h
+    ${CMAKE_SOURCE_DIR}/src/iocommand/iocommand.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/usbdevice/usbdevice.h
+    ${CMAKE_SOURCE_DIR}/src/usbdevice/usbdevice.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

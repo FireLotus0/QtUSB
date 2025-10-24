@@ -9,8 +9,6 @@ UsbMonitor::UsbMonitor(QObject *parent)
         : QObject(parent)
 {
     initMonitor();
-    qRegisterMetaType<UsbId>("UsbId");
-    qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap*");
 }
 
 UsbMonitor &UsbMonitor::instance() {

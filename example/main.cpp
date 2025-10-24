@@ -26,6 +26,10 @@ public slots:
 int main(int argc, char *argv[]) {
     QCoreApplication application(argc, argv);
 
+    qRegisterMetaType<UsbId>("UsbId");
+    qRegisterMetaType<IoData>("RequestData");
+    qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap*");
+
     libusb_init_context(NULL, NULL, 0);
     QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceAttached, [&](UsbId id, LibUsbDevWrap dev) {
         qDebug() << "device attached: " << id;
