@@ -6,6 +6,8 @@
 #include <qthread.h>
 #include <qtimer.h>
 
+#include "src/usbdevice/usbdevice.h"
+
 USING_QT_USB_NAMESPACE
 
 class Test : public QObject {
@@ -29,12 +31,27 @@ int main(int argc, char *argv[]) {
     qRegisterMetaType<UsbId>("UsbId");
     qRegisterMetaType<IoData>("RequestData");
     qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap*");
+    qRegisterMetaType<IoData>("IoData");
 
+    QTimer readTimer;
+    readTimer.setInterval(100);
     libusb_init_context(NULL, NULL, 0);
+    UsbDevice device;
+    readTimer.callOnTimeout([&]() {
+           device.read();
+       });
+    readTimer.start();
+    QObject::connect(&device, &UsbDevice::readFinished, [](const QByteArray& data) {
+          qDebug() << "read: " << data;
+      });
+
+    QObject::connect(&device, &UsbDevice::errorOccurred, [](int errorCode, const QString& errorString) {
+       qDebug() << "err: " << errorString;
+   });
     QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceAttached, [&](UsbId id, LibUsbDevWrap dev) {
         qDebug() << "device attached: " << id;
-        UsbDescriptor descriptor(dev.device);
-        descriptor.printInfo();
+        device.openDevice(id, dev.device);
+        device.setConfiguration(ActiveUSBConfig{1, 0, 1});
     });
 
     QObject::connect(&UsbMonitor::instance(), &UsbMonitor::deviceDetached, [&](UsbId id) {

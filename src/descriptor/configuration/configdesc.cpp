@@ -22,11 +22,11 @@ void ConfigDesc::resolveInfo() {
     } else {
         content += genContentLine("Configuration #", QString::number(configIndex), " ID=", QString::number(desc->bConfigurationValue));
         content += genContentLine("Interface Counts: ", QString::number(desc->bNumInterfaces));
+        ConfigurationData configurationData;
+        configurationData.configurationValue = desc->bConfigurationValue;
+        descriptorData->configurations.insert(desc->bConfigurationValue, configurationData);
         for(int i = 0; i < desc->bNumInterfaces; i++) {
-            ConfigurationData configurationData;
-            configurationData.configurationValue = desc->bConfigurationValue;
-            descriptorData->configurations.insert(desc->bConfigurationValue, configurationData);
-            auto interface = new InterfaceDesc(device, desc->interface[i], i, &configurationData);
+            auto interface = new InterfaceDesc(device, desc->interface[i], i, &descriptorData->configurations[desc->bConfigurationValue]);
             interface->resolveInfo();
             children.append(interface);
         }

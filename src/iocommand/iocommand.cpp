@@ -28,7 +28,7 @@ void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
 }
 
 void IoCommand::initContext() {
-    if(descriptorData.fullDuplexSupported) {
+    if(!descriptorData.fullDuplexSupported) {
         ioContext.transferContext = new TransferContext;
         connect(ioContext.transferContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
     } else {
@@ -63,7 +63,7 @@ void IoCommand::makeIoData(TransferDirection direction, QByteArray &&data) {
     ioData.transferDirection = direction;
     ioData.transferStrategy = transTypeToStrategy(true, endPoint.transferType);
     ioData.data = std::move(data);
-    if(descriptorData.fullDuplexSupported) {
+    if(!descriptorData.fullDuplexSupported) {
         ioContext.transferQueue.enqueue(ioData);
     } else {
         if(direction == TransferDirection::HOST_TO_DEVICE) {
@@ -119,7 +119,7 @@ void IoCommand::doTransfer(bool read) {
 }
 
 void IoCommand::onTransferFinished(const IoData &data) {
-    if(data.transferDirection == TransferDirection::HOST_TO_DEVICE) {
+    if(data.transferDirection == TransferDirection::DEVICE_TO_HOST) {
         if(descriptorData.fullDuplexSupported) {
             ioContext.readQueue.dequeue();
             ioContext.isReading = false;

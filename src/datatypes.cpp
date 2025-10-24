@@ -63,7 +63,7 @@ IoData::IoData(const IoData &other) {
     data = other.data;
     address = other.address;
     maxPacketSize = other.maxPacketSize;
-    resultCode = other.maxPacketSize;
+    resultCode = other.resultCode;
     transferDirection = other.transferDirection;
     transferStrategy = other.transferStrategy;
     handle = other.handle;

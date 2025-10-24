@@ -17,6 +17,8 @@ public:
 
     void printInfo() const;
 
+    DescriptorData getDescriptorData() const;
+
 private:
     DescriptorBase* descriptor{};
     QString configInfo;

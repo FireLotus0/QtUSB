@@ -19,11 +19,11 @@ void InterfaceAlter::resolveInfo() {
     content += genContentLine("Interface Number:", QString::number(desc.bInterfaceNumber));
     content += genContentLine("Alternate Setting:", QString::number(desc.bAlternateSetting));
     content += genContentLine("EndPoint Counts:", QString::number(desc.bNumEndpoints));
+    InterfaceData interfaceData;
+    interfaceData.interfaceNumber = desc.bInterfaceNumber;
+    configurationData->interfaces.insert(desc.bInterfaceNumber, interfaceData);
     for(int i = 0; i < desc.bNumEndpoints; i++) {
-        InterfaceData interfaceData;
-        interfaceData.interfaceNumber = desc.bInterfaceNumber;
-        configurationData->interfaces.insert(desc.bInterfaceNumber, interfaceData);
-        auto endPoint = new EndPointDesc(device, desc.endpoint[i], &interfaceData);
+        auto endPoint = new EndPointDesc(device, desc.endpoint[i], &configurationData->interfaces[desc.bInterfaceNumber]);
         endPoint->resolveInfo();
         children.append(endPoint);
     }
