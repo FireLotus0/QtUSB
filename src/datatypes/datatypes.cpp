@@ -1,4 +1,4 @@
-#include "datatypes.h"
+#include "../../include/QtUsb/datatypes.h"
 #include <qdebug.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -48,7 +48,7 @@ TransferStrategy transTypeToStrategy(bool sync, TransferType type) {
     }
 }
 
-IoData::IoData(QT_USB::IoData &&other) {
+IoData::IoData(QT_USB::IoData &&other) noexcept {
     data = std::move(other.data);
     address = other.address;
     maxPacketSize = other.maxPacketSize;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/usb_namespace.h"
-#include "src/libusb.h"
+#include "include/QtUsb/usb_namespace.h"
+#include "../../include/QtUsb/libusb.h"
 #include "src/transfer/transfercontext.h"
 #include "src/descriptor/descriptorbase/descriptordata.h"
 #include <qobject.h>

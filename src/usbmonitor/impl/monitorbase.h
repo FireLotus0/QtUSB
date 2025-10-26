@@ -1,14 +1,16 @@
 #pragma once
 
-#include "src/datatypes.h"
+#include "../../../include/QtUsb/datatypes.h"
 #include <qobject.h>
 #include <qatomic.h>
 
 QT_USB_NAMESPACE_BEGIN
 
+class UsbMonitor;
+
 class MonitorBase : public QObject {
 public:
-    explicit MonitorBase(QObject *parent = nullptr);
+    explicit MonitorBase(UsbMonitor* usbMonitor, QObject *parent = nullptr);
     virtual ~MonitorBase();
 
     virtual void addMonitorId(UsbId id) = 0;
@@ -17,8 +19,9 @@ public:
     virtual void startMonitor();
     virtual void stopMonitor();
 
-protected:
+public:
     QAtomicInt monitorFlag{0};
+    UsbMonitor* usbMonitor{};
 };
 
 QT_USB_NAMESPACE_END

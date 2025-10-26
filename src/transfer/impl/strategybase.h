@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/datatypes.h"
+#include "../../../include/QtUsb/datatypes.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN

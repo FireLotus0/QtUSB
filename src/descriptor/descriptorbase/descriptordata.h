@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/usb_namespace.h"
-#include "src/datatypes.h"
+#include "../../../include/QtUsb/usb_namespace.h"
+#include "../../../include/QtUsb/datatypes.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -31,12 +31,6 @@ struct ConfigurationData {
 struct DescriptorData {
     bool fullDuplexSupported{false};
     QMap<quint8, ConfigurationData> configurations;
-};
-
-struct ActiveUSBConfig {
-    quint8 configuration = 0xFF;
-    quint8 interface = 0xFF;
-    uint8_t pointNumber = 0xFF;
 };
 
 QT_USB_NAMESPACE_END

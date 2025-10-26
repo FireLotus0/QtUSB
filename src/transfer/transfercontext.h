@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/usb_namespace.h"
+#include "../../include/QtUsb/usb_namespace.h"
 #include "src/transfer/impl/strategybase.h"
 #include <qobject.h>
 #include <qmap.h>

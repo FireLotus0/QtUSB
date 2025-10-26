@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(Qt5Core REQUIRED)
+
+set(QTUSB_INCLUDE_DIRS  "@PACKAGE_INCLUDE_INSTALL_DIR@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+set(QTUSB_FOUND TRUE)
+set(QTUSB_VERSION "@PACKAGE_VERSION@")
+
+# 方便用户知道模块路径
+set(QtUsb_DIR "${CMAKE_CURRENT_LIST_DIR}")

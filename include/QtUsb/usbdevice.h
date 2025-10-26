@@ -1,12 +1,13 @@
 #pragma once
 
-#include "src/usb_namespace.h"
-#include "src/iocommand/iocommand.h"
+#include "QtUsb/usb_namespace.h"
+#include "QtUsb/datatypes.h"
 #include <qobject.h>
 
-#include "src/descriptor/usbdescriptor.h"
-
 QT_USB_NAMESPACE_BEGIN
+class IoCommand;
+class UsbDescriptor;
+
 class UsbDevice : public QObject {
     Q_OBJECT
 
@@ -14,6 +15,8 @@ public:
     explicit UsbDevice(QObject *parent = nullptr);
 
     ~UsbDevice();
+
+    void setValid(bool valid);
 
     void openDevice(UsbId usbId, libusb_device *device);
 
@@ -27,10 +30,11 @@ signals:
     void deviceConnected(QT_USB::UsbId id);
     void deviceDisconnected(QT_USB::UsbId id);
     void readFinished(const QByteArray &data);
+    void writeFinished();
     void errorOccurred(int errorCode, const QString& errorString);
 
-
 private:
+    std::atomic<bool> validFlag{false};
     UsbId id;
     UsbDescriptor* descriptor;
     ActiveUSBConfig usbCfg;

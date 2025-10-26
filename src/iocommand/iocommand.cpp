@@ -40,7 +40,7 @@ void IoCommand::initContext() {
 }
 
 IoCommand::~IoCommand() {
-    if(descriptorData.fullDuplexSupported) {
+    if(!descriptorData.fullDuplexSupported) {
         delete ioContext.transferContext;
     } else {
         delete ioContext.readContext;

@@ -2,8 +2,8 @@
 
 #include <qmetatype.h>
 
-#include "src/usb_namespace.h"
-#include "libusb.h"
+#include "usb_namespace.h"
+#include "QtUsb/libusb.h"
 #include <QtGlobal>
 
 QT_USB_NAMESPACE_BEGIN
@@ -70,7 +70,7 @@ struct ControlRequestData {
 struct IoData {
     IoData() = default;
     IoData(const IoData& data);
-    IoData(IoData&& data);
+    IoData(IoData&& data) noexcept;
 
     QByteArray data;
     uint8_t address{0};
@@ -82,6 +82,11 @@ struct IoData {
     ControlRequestData controlRequestData;
 };
 
+struct ActiveUSBConfig {
+    quint8 configuration = 0xFF;
+    quint8 interface = 0xFF;
+    uint8_t pointNumber = 0xFF;
+};
 
 
 QT_USB_NAMESPACE_END

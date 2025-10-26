@@ -1,4 +1,6 @@
-#include "usbdevice.h"
+#include "../../include/QtUsb/usbdevice.h"
+#include "src/iocommand/iocommand.h"
+#include "src/descriptor/usbdescriptor.h"
 #include <qdebug.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -7,34 +9,46 @@ UsbDevice::UsbDevice(QObject *parent)
 }
 
 
-QT_USB::UsbDevice::~UsbDevice() {
-    delete ioCommand;
-    delete descriptor;
+UsbDevice::~UsbDevice() {
+    if (ioCommand) {
+        delete ioCommand;
+    }
+    if (descriptor) {
+        delete descriptor;
+    }
     if (usbCfg.interface != 0xFF) {
         libusb_release_interface(handle, usbCfg.interface);
     }
     if (handle) {
         libusb_close(handle);
     }
+    qDebug() << "UsbDevice::~UsbDevice: " << id;
+}
+
+void UsbDevice::setValid(bool valid) {
+    bool value = validFlag.load(std::memory_order_relaxed);
+    while (!validFlag.compare_exchange_weak(value, valid, std::memory_order_release, std::memory_order_relaxed)) {
+    };
 }
 
 void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
-    if (!handle) {
-        qWarning() << "UsbDevice::setConfiguration: libusb device not opened";
+    if (!validFlag.load(std::memory_order_relaxed)) {
+        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface != 0xFF) {
         libusb_release_interface(handle, usbCfg.interface);
     }
     libusb_set_configuration(handle, usbCfg.interface);
+    /// TODO: Claim interface may failed on unix!
     libusb_claim_interface(handle, newCfg.interface);
     usbCfg = newCfg;
     ioCommand->setConfiguration(newCfg);
 }
 
 void UsbDevice::read() const {
-    if (!ioCommand) {
-        qWarning() << "UsbDevice::read: No IO command received";
+    if (!validFlag.load(std::memory_order_relaxed)) {
+        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface == 0xFF) {
@@ -45,8 +59,8 @@ void UsbDevice::read() const {
 }
 
 void UsbDevice::write(QByteArray &&data) const {
-    if (!ioCommand) {
-        qWarning() << "UsbDevice::write: No IO command received";
+    if (!validFlag.load(std::memory_order_relaxed)) {
+        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface == 0xFF) {
@@ -72,8 +86,9 @@ void UsbDevice::openDevice(UsbId usbId, libusb_device *device) {
     ioCommand = new IoCommand(descriptor->getDescriptorData(), handle);
     descriptor->printInfo();
     connect(ioCommand, &IoCommand::readFinished, this, &UsbDevice::readFinished);
+    connect(ioCommand, &IoCommand::writeFinished, this, &UsbDevice::writeFinished);
     connect(ioCommand, &IoCommand::errorOccurred, this, &UsbDevice::errorOccurred);
-
+    setValid(true);
 }
 
 QT_USB_NAMESPACE_END

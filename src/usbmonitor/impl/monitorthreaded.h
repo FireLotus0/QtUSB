@@ -6,14 +6,15 @@
 #include <qmutex.h>
 #include <qmap.h>
 
-#include "src/libusb.h"
+#include "../../../include/QtUsb/libusb.h"
+#include "src/usbmonitor/usbmonitor.h"
 
 QT_USB_NAMESPACE_BEGIN
 class MonitorWorker;
 
 class MonitorThreaded : public MonitorBase {
 public:
-    explicit MonitorThreaded(QObject *parent = nullptr);
+    explicit MonitorThreaded(UsbMonitor* usbMonitor, QObject *parent = nullptr);
 
     virtual ~MonitorThreaded();
 
@@ -34,7 +35,7 @@ private:
 class MonitorWorker : public QObject {
     Q_OBJECT
 public:
-    explicit MonitorWorker(QAtomicInt &workerEnable, QAtomicInt &monitorFlag, QObject *parent = nullptr);
+    explicit MonitorWorker(UsbMonitor* usbMonitor, QAtomicInt &workerEnable, QAtomicInt &monitorFlag, QObject *parent = nullptr);
 
 signals:
     void startMonitor();
@@ -49,6 +50,7 @@ private slots:
 private:
     void updateMonitorIds();
 private:
+    UsbMonitor* usbMonitor;
     UsbId usbIdTemp;
     libusb_device **devLists;
     QAtomicInt &workerEnable;

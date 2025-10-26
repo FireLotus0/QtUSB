@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/datatypes.h"
-#include "src/libusb.h"
+#include "../../include/QtUsb/datatypes.h"
+#include "include/QtUsb/libusb.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -11,23 +11,22 @@ class MonitorBase;
 class UsbMonitor : public QObject {
 Q_OBJECT
 public:
-    static UsbMonitor& instance();
+    explicit UsbMonitor(QObject *parent = nullptr);
+    ~UsbMonitor();
 
     void addMonitorId(UsbId id);
 
     void removeMonitorId(UsbId id);
 
-    void start();
+    void start() const;
 
-    void stop();
+    void stop() const;
 
 signals:
     void deviceAttached(UsbId id, LibUsbDevWrap device);
     void deviceDetached(UsbId id);
 
 private:
-    explicit UsbMonitor(QObject *parent = nullptr);
-
     void initMonitor();
 private:
     MonitorBase*  monitor;

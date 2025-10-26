@@ -17,6 +17,7 @@ UsbDescriptor::UsbDescriptor(libusb_device *device, QObject *parent)
     descriptor->releaseChildren();
     delete descriptor;
     descriptor = nullptr;
+    libusb_unref_device(device);
 }
 
 void UsbDescriptor::printInfo() const {

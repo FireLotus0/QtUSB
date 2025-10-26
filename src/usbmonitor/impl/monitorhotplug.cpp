@@ -4,8 +4,7 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-QT_USB::MonitorHotplug::MonitorHotplug(QObject *parent)
-{
+MonitorHotplug::MonitorHotplug(UsbMonitor* usbMonitor, QObject *parent) : MonitorBase(usbMonitor, parent) {
 }
 
 MonitorHotplug::~MonitorHotplug() {
@@ -20,7 +19,7 @@ void MonitorHotplug::addMonitorId(UsbId id) {
     }
     libusb_hotplug_callback_handle handle;
     auto rc = libusb_hotplug_register_callback(nullptr, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, id.vid, id.pid,
-                                               LIBUSB_HOTPLUG_MATCH_ANY, hotplugCallback, &monitorFlag, &handle);
+                                               LIBUSB_HOTPLUG_MATCH_ANY, hotplugCallback, this, &handle);
     if (rc != LIBUSB_SUCCESS) {
         qWarning() << "Register HotPlug failed: " << libusb_error_name(rc);
     } else {
@@ -40,11 +39,13 @@ int hotplugCallback(libusb_context *context, libusb_device *dev, libusb_hotplug_
     static libusb_device_handle *dev_handle = nullptr;
     libusb_device_descriptor desc;
     libusb_get_device_descriptor(dev, &desc);
+    auto monitorHotPlug = (MonitorHotplug*)user_data;
     if (*((QAtomicInt*)user_data) == 1) {
         if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
-            UsbMonitor::instance().deviceAttached({desc.idProduct, desc.idVendor}, {dev});
+            libusb_ref_device(dev);
+            monitorHotPlug->usbMonitor->deviceAttached({desc.idProduct, desc.idVendor}, {dev});
         } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
-            UsbMonitor::instance().deviceDetached({desc.idProduct, desc.idVendor});
+            monitorHotPlug->usbMonitor->deviceDetached({desc.idProduct, desc.idVendor});
         } else {
             qWarning() << "HotPlug callback returned an invalid event";
         }

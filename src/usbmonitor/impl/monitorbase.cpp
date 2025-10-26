@@ -2,9 +2,9 @@
 #include <qdebug.h>
 
 QT_USB_NAMESPACE_BEGIN
-
-MonitorBase::MonitorBase(QObject *parent)
-        : QObject(parent) {
+MonitorBase::MonitorBase(UsbMonitor *usbMonitor, QObject *parent)
+    : QObject(parent)
+    , usbMonitor(usbMonitor) {
 }
 
 MonitorBase::~MonitorBase() {

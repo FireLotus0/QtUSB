@@ -1,5 +1,5 @@
 #include "usbmonitor.h"
-#include "src/libusb.h"
+#include "../../include/QtUsb/libusb.h"
 #include "src/usbmonitor/impl/monitorthreaded.h"
 #include "src/usbmonitor/impl/monitorhotplug.h"
 
@@ -11,16 +11,16 @@ UsbMonitor::UsbMonitor(QObject *parent)
     initMonitor();
 }
 
-UsbMonitor &UsbMonitor::instance() {
-    static UsbMonitor monitor;
-    return monitor;
+UsbMonitor::~UsbMonitor() {
+    stop();
+    delete monitor;
 }
 
-void UsbMonitor::start() {
+void UsbMonitor::start() const {
     monitor->startMonitor();
 }
 
-void UsbMonitor::stop() {
+void UsbMonitor::stop() const {
     monitor->stopMonitor();
 }
 

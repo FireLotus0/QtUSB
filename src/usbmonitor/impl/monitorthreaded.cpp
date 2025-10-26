@@ -4,11 +4,10 @@
 #include <QCoreApplication>
 
 QT_USB_NAMESPACE_BEGIN
-
-MonitorThreaded::MonitorThreaded(QObject *parent)
-        : MonitorBase(parent) {
+MonitorThreaded::MonitorThreaded(UsbMonitor *usbMonitor, QObject *parent)
+    : MonitorBase(usbMonitor, parent) {
     workThr = new QThread(this);
-    worker = new MonitorWorker(workerEnable, monitorFlag);
+    worker = new MonitorWorker(usbMonitor, workerEnable, monitorFlag);
     worker->moveToThread(workThr);
     connect(workThr, &QThread::finished, worker, &QObject::deleteLater);
     workThr->start();
@@ -40,8 +39,8 @@ void MonitorThreaded::stopMonitor() {
     workerEnable.storeRelaxed(0);
 }
 
-MonitorWorker::MonitorWorker(QAtomicInt &workerEnable, QAtomicInt &monitorFlag, QObject *parent)
-        : QObject(parent), workerEnable(workerEnable), monitorFlag(monitorFlag) {
+MonitorWorker::MonitorWorker(UsbMonitor* usbMonitor, QAtomicInt &workerEnable, QAtomicInt &monitorFlag, QObject *parent)
+    : QObject(parent), workerEnable(workerEnable), monitorFlag(monitorFlag), usbMonitor(usbMonitor) {
     connect(this, &MonitorWorker::startMonitor, this, &MonitorWorker::onStartMonitor);
     connect(this, &MonitorWorker::addMonitorId, this, &MonitorWorker::onAddMonitorId, Qt::QueuedConnection);
     connect(this, &MonitorWorker::removeMonitorId, this, &MonitorWorker::onRemoveMonitorId);
@@ -50,7 +49,7 @@ MonitorWorker::MonitorWorker(QAtomicInt &workerEnable, QAtomicInt &monitorFlag, 
 void MonitorWorker::onStartMonitor() {
     while (workerEnable.loadRelaxed() == 1 && monitorFlag.loadRelaxed() == 1) {
         int count = libusb_get_device_list(nullptr, &devLists);
-        for(auto id : searchCache.keys()) {
+        for (auto id: searchCache.keys()) {
             searchCache[id] = false;
         }
         for (int i = 0; i < count; i++) {
@@ -58,24 +57,25 @@ void MonitorWorker::onStartMonitor() {
             if (ret >= 0) {
                 usbIdTemp.pid = descriptor.idProduct;
                 usbIdTemp.vid = descriptor.idVendor;
-                if(monitorIds.contains(usbIdTemp)) {
+                if (monitorIds.contains(usbIdTemp)) {
                     searchCache[usbIdTemp] = true;
-                    if(!monitorIds[usbIdTemp]) {
+                    if (!monitorIds[usbIdTemp]) {
                         monitorIds[usbIdTemp] = true;
-                        UsbMonitor::instance().deviceAttached(usbIdTemp, {devLists[i]});
+                        libusb_ref_device(devLists[i]);
+                        usbMonitor->deviceAttached(usbIdTemp, {devLists[i]});
                     }
                 }
             } else {
                 qDebug() << libusb_error_name(ret);
             }
         }
-        for(auto id : searchCache.keys()) {
-            if(!searchCache[id] && monitorIds[id]) {
+        for (auto id: searchCache.keys()) {
+            if (!searchCache[id] && monitorIds[id]) {
                 monitorIds[id] = false;
-                UsbMonitor::instance().deviceDetached(id);
+                usbMonitor->deviceDetached(id);
             }
         }
-        libusb_free_device_list(devLists, 1);
+        // libusb_free_device_list(devLists, 1);
         updateMonitorIds();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
         QThread::msleep(500);

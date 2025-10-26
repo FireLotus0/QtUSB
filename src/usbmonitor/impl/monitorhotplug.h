@@ -1,13 +1,13 @@
 #pragma once
 
 #include "src/usbmonitor/impl/monitorbase.h"
-#include "src/libusb.h"
+#include "../../../include/QtUsb/libusb.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN
 class MonitorHotplug : public MonitorBase {
 public:
-    explicit MonitorHotplug(QObject *parent = nullptr);
+    explicit MonitorHotplug(UsbMonitor* usbMonitor, QObject *parent = nullptr);
 
     ~MonitorHotplug() final;
 
