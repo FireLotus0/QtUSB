@@ -117,3 +117,5 @@ install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/QtUsbConfigVersion.cmake"
     DESTINATION lib/cmake/QtUsb
 )
+
+add_subdirectory(test)
