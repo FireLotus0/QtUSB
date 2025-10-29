@@ -1,7 +1,6 @@
-# 项目名称
+# QtUsb
 
-简要介绍你的项目，比如：
-基于 Qt 封装的 libusb，同步传输在独立线程中执行，使用简单高效的 USB 设备访问库。
+基于 Qt 封装的 libusb，旨在简化USB设备读写，方便开发。
 
 ---
 
@@ -37,7 +36,7 @@
 
 说明如何集成库：
 
-- 编译依赖(以下为Linux平台，在windows使用IDE进行构建即可)
+- 编译依赖(以下为Linux平台，windows使用IDE进行构建即可)
 ```
 git clone git@github.com:FireLotus0/QtUSB.git
 cd QtUSB
