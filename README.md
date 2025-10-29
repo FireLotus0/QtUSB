@@ -21,13 +21,14 @@
 - 异步传输：libusb同步接口在线程中实现；libusb异步接口目前未实现
 - API接口简单，只需要调用read，write进行数据传输，传输完成会发送对应信号
 - 支持常见的 USB 设备控制和数据传输
+- usb 3.0默认全双工传输，可以通过配置参数设置为半双工，将会对所有读写命令进行队列同步
 
 ---
 
 ## 环境要求
 
 - Qt5
-- libusb 版本（例如 libusb 1.0）
+- libusb 版本（libusb 1.0）
 - 支持的操作系统（Windows, Linux）
 
 ---
@@ -53,12 +54,12 @@ find_package(QtUsb REQUIRED)
 target_link_libraries (${PROJECT_NAME} PUBLIC QtUsb::QtUsb)
 ```
 - 使用步骤示例
-1. 添加要监听的设备ID，可监听多个设备：UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
-2. 连接设备热插拔信号: UsbDevManager::deviceAttached  UsbDevManager::deviceDetached
-3. 通过ID获取设备:  UsbDevManager::instance().getDevice(id);
-4. 设置设备配置： device->setConfiguration(ActiveUSBConfig{1, 0, 1, 8});
-5. 监听设备信号: UsbDevice::readFinished  UsbDevice::writeFinished  UsbDevice::errorOccurred
-6. 读写设备：read  write
+1. 连接设备热插拔信号: UsbDevManager::deviceAttached， UsbDevManager::deviceDetached
+2. 添加要监听的设备ID，可监听多个设备：UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
+3. 通过ID获取设备: UsbDevManager::instance().getDevice(id);
+4. 选择配置： device->setConfiguration(ActiveUSBConfig{1, 0, 1, 8});
+5. 监听设备信号: UsbDevice::readFinished，  UsbDevice::writeFinished，  UsbDevice::errorOccurred
+6. 读写设备：read， write
 ---
 
 ## 关键类
@@ -66,7 +67,7 @@ target_link_libraries (${PROJECT_NAME} PUBLIC QtUsb::QtUsb)
 | 类名          | 说明                     |
 |---------------|--------------------------|
 | UsbDevice     | USB设备封装类             |
-| UsbDevManager | USB设备管理类，提供获取UsbDevice的接口，且获取的UsbDevice线程安全           |
+| UsbDevManager | USB设备管理类，提供获取UsbDevice的接口，获取的UsbDevice线程安全           |
 
 ---
 
