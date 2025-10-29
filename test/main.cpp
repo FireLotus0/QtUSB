@@ -1,11 +1,9 @@
 #include "QtUsb/usbdevmanager.h"
 #include "QtUsb/usbdevice.h"
-
 #include <qdebug.h>
 #include <qcoreapplication.h>
 #include <qthread.h>
 #include <qtimer.h>
-
 
 USING_QT_USB_NAMESPACE
 

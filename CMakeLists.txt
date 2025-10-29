@@ -118,4 +118,4 @@ install(FILES
     DESTINATION lib/cmake/QtUsb
 )
 
-add_subdirectory(test EXCLUDE_FROM_ALL)
+#add_subdirectory(test EXCLUDE_FROM_ALL)
