@@ -42,6 +42,8 @@ private:
 
     void initSpeedTimer();
 
+    void releaseContext();
+
 private:
     struct IoContext {
         TransferContext* readContext, *writeContext, *transferContext;

@@ -8,7 +8,6 @@ IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device
     , handle(handle)
     , QObject(parent)
 {
-    initContext();
     initSpeedTimer();
 }
 
@@ -26,14 +25,11 @@ void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
     } else {
         curInterface = &curCfg->interfaces[config.interface];
     }
-    if(descriptorData.fullDuplexSupported) {
-        ioContext.readContext->setReadCacheSize(cfg.readCacheSize);
-    } else {
-        ioContext.transferContext->setReadCacheSize(cfg.readCacheSize);
-    }
+    initContext();
 }
 
 void IoCommand::initContext() {
+    releaseContext();
     if(!descriptorData.fullDuplexSupported) {
         ioContext.transferContext = new TransferContext;
         connect(ioContext.transferContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
@@ -43,15 +39,15 @@ void IoCommand::initContext() {
         connect(ioContext.readContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
         connect(ioContext.writeContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
     }
+    if(descriptorData.fullDuplexSupported && !config.queuedCommands) {
+        ioContext.readContext->setReadCacheSize(config.readCacheSize);
+    } else {
+        ioContext.transferContext->setReadCacheSize(config.readCacheSize);
+    }
 }
 
 IoCommand::~IoCommand() {
-    if(!descriptorData.fullDuplexSupported) {
-        delete ioContext.transferContext;
-    } else {
-        delete ioContext.readContext;
-        delete ioContext.writeContext;
-    }
+    releaseContext();
 }
 
 void IoCommand::makeIoData(TransferDirection direction, QByteArray &&data) {
@@ -69,7 +65,7 @@ void IoCommand::makeIoData(TransferDirection direction, QByteArray &&data) {
     ioData.transferDirection = direction;
     ioData.transferStrategy = transTypeToStrategy(true, endPoint.transferType);
     ioData.data = std::move(data);
-    if(!descriptorData.fullDuplexSupported) {
+    if(!descriptorData.fullDuplexSupported || config.queuedCommands) {
         ioContext.transferQueue.enqueue(ioData);
     } else {
         if(direction == TransferDirection::HOST_TO_DEVICE) {
@@ -94,13 +90,13 @@ void IoCommand::write(QByteArray &&data) {
 
 void IoCommand::doTransfer(bool read) {
     if(read) {
-        if(descriptorData.fullDuplexSupported && !ioContext.isReading) {
+        if(descriptorData.fullDuplexSupported && !config.queuedCommands && !ioContext.isReading) {
             if(ioContext.readQueue.empty()) {
                 return;
             }
             ioContext.readContext->transfer(ioContext.readQueue.head());
             ioContext.isReading = true;
-        } else if(!descriptorData.fullDuplexSupported && !ioContext.isTransferring){
+        } else if((!descriptorData.fullDuplexSupported || config.queuedCommands) && !ioContext.isTransferring){
             if(ioContext.transferQueue.empty()) {
                 return;
             }
@@ -108,13 +104,13 @@ void IoCommand::doTransfer(bool read) {
             ioContext.isTransferring = true;
         }
     } else {
-        if(descriptorData.fullDuplexSupported && !ioContext.isWriting) {
+        if(descriptorData.fullDuplexSupported && !config.queuedCommands && !ioContext.isWriting) {
             if(ioContext.writeQueue.empty()) {
                 return;
             }
             ioContext.writeContext->transfer(ioContext.writeQueue.head());
             ioContext.isWriting = true;
-        } else if(!descriptorData.fullDuplexSupported && !ioContext.isTransferring) {
+        } else if((!descriptorData.fullDuplexSupported || config.queuedCommands) && !ioContext.isTransferring) {
             if(ioContext.transferQueue.empty()) {
                 return;
             }
@@ -129,7 +125,7 @@ void IoCommand::onTransferFinished(const IoData &data) {
         bytesCounter += data.data.size();
     }
     if(data.transferDirection == TransferDirection::DEVICE_TO_HOST) {
-        if(descriptorData.fullDuplexSupported) {
+        if(descriptorData.fullDuplexSupported && !config.queuedCommands) {
             ioContext.readQueue.dequeue();
             ioContext.isReading = false;
         } else {
@@ -141,7 +137,7 @@ void IoCommand::onTransferFinished(const IoData &data) {
         }
         doTransfer(true);
     } else {
-        if(descriptorData.fullDuplexSupported) {
+        if(descriptorData.fullDuplexSupported && !config.queuedCommands) {
             ioContext.writeQueue.dequeue();
             ioContext.isWriting = false;
         } else {
@@ -181,6 +177,21 @@ void IoCommand::initSpeedTimer() {
         qInfo().noquote() << "read speed: " << QString::number(speed, 'f', 3) << speedUnit;
         bytesCounter = 0;
     });
+}
+
+void IoCommand::releaseContext() {
+    if(ioContext.transferContext) {
+        delete ioContext.transferContext;
+        ioContext.transferContext = nullptr;
+    }
+    if(ioContext.readContext) {
+        delete ioContext.readContext;
+        ioContext.readContext = nullptr;
+    }
+    if(ioContext.writeContext) {
+        delete ioContext.writeContext;
+        ioContext.writeContext = nullptr;
+    }
 }
 
 QT_USB_NAMESPACE_END
