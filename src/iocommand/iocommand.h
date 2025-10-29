@@ -46,7 +46,7 @@ private:
 
 private:
     struct IoContext {
-        TransferContext* readContext, *writeContext, *transferContext;
+        TransferContext* readContext{nullptr}, *writeContext{nullptr}, *transferContext{nullptr};
         QQueue<IoData> readQueue, writeQueue, transferQueue;
         bool isReading{false}, isWriting{false}, isTransferring{false};
     };

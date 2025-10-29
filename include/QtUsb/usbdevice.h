@@ -29,8 +29,6 @@ public:
     void setSpeedPrintEnable(bool enable);
 
 signals:
-    void deviceConnected(QT_USB::UsbId id);
-    void deviceDisconnected(QT_USB::UsbId id);
     void readFinished(const QByteArray &data);
     void writeFinished();
     void errorOccurred(int errorCode, const QString& errorString);
