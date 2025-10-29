@@ -26,6 +26,8 @@ public:
 
     void write(QByteArray &&data) const;
 
+    void setSpeedPrintEnable(bool enable);
+
 signals:
     void deviceConnected(QT_USB::UsbId id);
     void deviceDisconnected(QT_USB::UsbId id);

@@ -9,6 +9,7 @@ IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device
     , QObject(parent)
 {
     initContext();
+    initSpeedTimer();
 }
 
 void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
@@ -24,6 +25,11 @@ void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
         return;
     } else {
         curInterface = &curCfg->interfaces[config.interface];
+    }
+    if(descriptorData.fullDuplexSupported) {
+        ioContext.readContext->setReadCacheSize(cfg.readCacheSize);
+    } else {
+        ioContext.transferContext->setReadCacheSize(cfg.readCacheSize);
     }
 }
 
@@ -119,6 +125,9 @@ void IoCommand::doTransfer(bool read) {
 }
 
 void IoCommand::onTransferFinished(const IoData &data) {
+    if(speedPrintable) {
+        bytesCounter += data.data.size();
+    }
     if(data.transferDirection == TransferDirection::DEVICE_TO_HOST) {
         if(descriptorData.fullDuplexSupported) {
             ioContext.readQueue.dequeue();
@@ -147,6 +156,31 @@ void IoCommand::onTransferFinished(const IoData &data) {
     if(data.resultCode != LIBUSB_SUCCESS) {
         emit errorOccurred(data.resultCode, QString(libusb_error_name(data.resultCode)));
     }
+}
+
+void IoCommand::setSpeedPrintEnable(bool enable) {
+    speedPrintable = enable;
+    if(enable) {
+        speedPrintTimer.start();
+    } else {
+        speedPrintTimer.stop();
+    }
+}
+
+void IoCommand::initSpeedTimer() {
+    speedPrintTimer.setInterval(1000);
+    speedPrintTimer.callOnTimeout([&]{
+        double speed = 0.0;
+        if(bytesCounter >= bytesMB) {
+            speed = (bytesCounter * 1.0) / bytesMB;
+            speedUnit = "mb/s";
+        } else {
+            speed = (bytesCounter * 1.0) / 1024;
+            speedUnit = "kb/s";
+        }
+        qInfo().noquote() << "read speed: " << QString::number(speed, 'f', 3) << speedUnit;
+        bytesCounter = 0;
+    });
 }
 
 QT_USB_NAMESPACE_END

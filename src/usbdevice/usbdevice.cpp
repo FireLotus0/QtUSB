@@ -40,10 +40,13 @@ void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
         libusb_release_interface(handle, usbCfg.interface);
     }
     libusb_set_configuration(handle, usbCfg.interface);
-    /// TODO: Claim interface may failed on unix!
-    libusb_claim_interface(handle, newCfg.interface);
-    usbCfg = newCfg;
-    ioCommand->setConfiguration(newCfg);
+    auto  rt = libusb_claim_interface(handle, newCfg.interface);
+    if(rt != 0) {
+        qWarning() << "UsbDevice::setConfiguration: claim interface failed, rt=" << rt << " " << libusb_error_name(rt);
+    } else {
+        usbCfg = newCfg;
+        ioCommand->setConfiguration(newCfg);
+    }
 }
 
 void UsbDevice::read() const {
@@ -89,6 +92,12 @@ void UsbDevice::openDevice(UsbId usbId, libusb_device *device) {
     connect(ioCommand, &IoCommand::writeFinished, this, &UsbDevice::writeFinished);
     connect(ioCommand, &IoCommand::errorOccurred, this, &UsbDevice::errorOccurred);
     setValid(true);
+}
+
+void UsbDevice::setSpeedPrintEnable(bool enable) {
+    if(ioCommand) {
+        ioCommand->setSpeedPrintEnable(enable);
+    }
 }
 
 QT_USB_NAMESPACE_END

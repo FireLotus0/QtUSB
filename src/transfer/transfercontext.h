@@ -18,6 +18,8 @@ public:
 
     void transfer(const IoData& data);
 
+    void setReadCacheSize(int size);
+
 signals:
     void transferFinished(const IoData& response);
 

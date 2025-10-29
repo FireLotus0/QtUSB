@@ -5,6 +5,7 @@
 #include "src/transfer/transfercontext.h"
 #include "src/descriptor/descriptorbase/descriptordata.h"
 #include <qobject.h>
+#include <qtimer.h>
 #include <qqueue>
 
 QT_USB_NAMESPACE_BEGIN
@@ -22,6 +23,8 @@ public:
 
     void write(QByteArray &&data);
 
+    void setSpeedPrintEnable(bool enable);
+
 signals:
     void readFinished(const QByteArray& data);
     void writeFinished();
@@ -36,6 +39,8 @@ private:
     void makeIoData(TransferDirection direction, QByteArray&& data);
 
     void doTransfer(bool read);
+
+    void initSpeedTimer();
 
 private:
     struct IoContext {
@@ -52,6 +57,12 @@ private:
     ActiveUSBConfig config;
     IoContext ioContext;
     libusb_device_handle* handle;
+
+    bool speedPrintable = false;
+    QTimer speedPrintTimer;
+    quint64 bytesCounter = 0;
+    const quint64 bytesMB = 1024 * 1024;
+    QString speedUnit = "mb/s";
 };
 
 QT_USB_NAMESPACE_END

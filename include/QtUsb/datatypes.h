@@ -86,6 +86,7 @@ struct ActiveUSBConfig {
     quint8 configuration = 0xFF;
     quint8 interface = 0xFF;
     uint8_t pointNumber = 0xFF;
+    int readCacheSize = 1024;
 };
 
 

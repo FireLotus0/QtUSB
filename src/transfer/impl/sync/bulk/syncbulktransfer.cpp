@@ -12,6 +12,7 @@ void SyncBulkTransfer::transfer(const IoData &request) {
     int transferred = 0;
     auto result = request;
     if(request.transferDirection == TransferDirection::HOST_TO_DEVICE) {
+        result.data.clear();
         int dataSize = request.data.size();
         int totalTransferred = 0;
         while(transferred < dataSize) {
@@ -27,8 +28,8 @@ void SyncBulkTransfer::transfer(const IoData &request) {
             }
         }
     } else {
-        if(readCache.size() < readCacheSize) {
-            readCache.resize(readCacheSize);
+        if(readCache.size() != readCacheSize.loadRelaxed()) {
+            readCache.resize(readCacheSize.loadRelaxed());
         }
         readCache.fill(0);
         result.resultCode = libusb_bulk_transfer(request.handle,  request.address, (unsigned char*)readCache.data(), readCacheSize, &transferred, timeout);

@@ -13,7 +13,7 @@ if(MSVC)
 endif ()
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
-find_library(USB_LIB NAMES libusb-1.0 usb-1.0)
+find_library(USB_LIB NAMES libusb-1.0 usb-1.0 usb)
 if (NOT USB_LIB)
     message(FATAL_ERROR "can`t find libusb")
 endif ()
@@ -118,4 +118,4 @@ install(FILES
     DESTINATION lib/cmake/QtUsb
 )
 
-add_subdirectory(test)
+add_subdirectory(test EXCLUDE_FROM_ALL)

@@ -11,7 +11,6 @@ UsbDevManager::UsbDevManager(QObject *parent)
     if (libusb_init(&ctx) < 0) {
         qWarning() << "libusb_init failed";
     } else {
-        libusb_init_context(nullptr, nullptr, 0);
         qRegisterMetaType<UsbId>("UsbId");
         qRegisterMetaType<IoData>("RequestData");
         qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap");

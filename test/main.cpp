@@ -25,8 +25,9 @@ public slots:
         QTimer::singleShot(100, [&, id] {
             device = UsbDevManager::instance().getDevice(id);
             if (device) {
+                device->setSpeedPrintEnable(true);
                 initUsbSig();
-                device->setConfiguration({1, 0, 1});
+                device->setConfiguration({1, 0, 1, 8});
                 readUsbTimer.start();
             }
         });

@@ -25,6 +25,12 @@ void TransferContext::transfer(const IoData &data) {
     worker->transfer(data);
 }
 
+void TransferContext::setReadCacheSize(int size) {
+    if(transferStrategies.contains(curTransStrategy)) {
+        transferStrategies[curTransStrategy]->setReadCacheSize(size);
+    }
+}
+
 TransferWorker::TransferWorker(TransferContext* context, QObject *parent)
     : QObject(parent)
     , context(context)

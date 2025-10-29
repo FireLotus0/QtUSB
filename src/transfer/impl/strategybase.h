@@ -12,11 +12,13 @@ public:
 
     virtual void transfer(const IoData &request) = 0;
 
+    void setReadCacheSize(int size);
+
 signals:
     void transferFinished(const IoData& rsponse);
 
 protected:
-    int readCacheSize = 1024;
+    QAtomicInt readCacheSize = 1024;
     int timeout = 2000;
     int transferInterval = 0;
     QByteArray readCache;

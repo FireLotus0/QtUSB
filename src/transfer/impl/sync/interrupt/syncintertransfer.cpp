@@ -27,8 +27,8 @@ void SyncInterTransfer::transfer(const IoData &request) {
             }
         }
     } else {
-        if(readCache.size() < readCacheSize) {
-            readCache.resize(readCacheSize);
+        if(readCache.size() != readCacheSize.loadRelaxed()) {
+            readCache.resize(readCacheSize.loadRelaxed());
         }
         readCache.fill(0);
         result.resultCode = libusb_interrupt_transfer(request.handle,  request.address, (unsigned char*)readCache.data(), readCacheSize, &transferred, timeout);
