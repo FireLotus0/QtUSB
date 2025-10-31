@@ -79,6 +79,7 @@ IoData &IoData::operator=(const IoData &other) {
     transferStrategy = other.transferStrategy;
     handle = other.handle;
     controlRequestData = other.controlRequestData;
+    return *this;
 }
 
 IoData &IoData::operator=(IoData &&other) {
@@ -89,7 +90,8 @@ IoData &IoData::operator=(IoData &&other) {
     transferDirection = other.transferDirection;
     transferStrategy = other.transferStrategy;
     handle = other.handle;
-    controlRequestData = std::move(other.controlRequestData);
+    controlRequestData = std::move(other.controlRequestData);\
+    return *this;
 }
 
 QT_USB_NAMESPACE_END
