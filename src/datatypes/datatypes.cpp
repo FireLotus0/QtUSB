@@ -1,4 +1,4 @@
-#include "../../include/QtUsb/datatypes.h"
+#include "include/QtUsb/datatypes.h"
 #include <qdebug.h>
 
 QT_USB_NAMESPACE_BEGIN
@@ -68,6 +68,28 @@ IoData::IoData(const IoData &other) {
     transferStrategy = other.transferStrategy;
     handle = other.handle;
     controlRequestData = other.controlRequestData;
+}
+
+IoData &IoData::operator=(const IoData &other) {
+    data = other.data;
+    address = other.address;
+    maxPacketSize = other.maxPacketSize;
+    resultCode = other.resultCode;
+    transferDirection = other.transferDirection;
+    transferStrategy = other.transferStrategy;
+    handle = other.handle;
+    controlRequestData = other.controlRequestData;
+}
+
+IoData &IoData::operator=(IoData &&other) {
+    data = std::move(other.data);
+    address = other.address;
+    maxPacketSize = other.maxPacketSize;
+    resultCode = other.maxPacketSize;
+    transferDirection = other.transferDirection;
+    transferStrategy = other.transferStrategy;
+    handle = other.handle;
+    controlRequestData = std::move(other.controlRequestData);
 }
 
 QT_USB_NAMESPACE_END

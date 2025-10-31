@@ -123,7 +123,6 @@ private:
             qDebug() << "usb error: " << errorString;
         });
     }
-``
 private:
     QSharedPointer<UsbDevice> device;
     QTimer readUsbTimer;

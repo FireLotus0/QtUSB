@@ -72,6 +72,9 @@ struct IoData {
     IoData(const IoData& data);
     IoData(IoData&& data) noexcept;
 
+    IoData& operator=(const IoData& data);
+    IoData& operator=(IoData&& data);
+
     QByteArray data;
     uint8_t address{0};
     uint16_t maxPacketSize{0};

@@ -6,7 +6,7 @@
 #include "src/descriptor/descriptorbase/descriptordata.h"
 #include <qobject.h>
 #include <qtimer.h>
-#include <qqueue>
+#include <QQueue>
 
 QT_USB_NAMESPACE_BEGIN
 
