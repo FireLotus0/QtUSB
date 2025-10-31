@@ -2,13 +2,14 @@
 
 #include "QtUsb/usb_namespace.h"
 #include "QtUsb/datatypes.h"
+#include "QtUsb/qtusb_export.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
 class IoCommand;
 class UsbDescriptor;
 
-class UsbDevice : public QObject {
+class QTUSB_API UsbDevice : public QObject {
     Q_OBJECT
 
 public:

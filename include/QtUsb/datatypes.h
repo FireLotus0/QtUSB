@@ -4,6 +4,7 @@
 
 #include "usb_namespace.h"
 #include "QtUsb/libusb.h"
+#include "QtUsb/qtusb_export.h"
 #include <qloggingcategory.h>
 #include <QtGlobal>
 
@@ -11,7 +12,7 @@ QT_USB_NAMESPACE_BEGIN
 
 Q_DECLARE_LOGGING_CATEGORY(usbCategory)
 
-struct UsbId {
+struct QTUSB_API UsbId {
     quint16 pid;
     quint16 vid;
 
@@ -53,7 +54,7 @@ enum class TransferStrategy {
 
 TransferStrategy transTypeToStrategy(bool sync, TransferType type);
 
-struct ControlRequestData {
+struct QTUSB_API ControlRequestData {
     /*
      * bit7: 方向 LIBUSB_ENDPOINT_IN, LIBUSB_ENDPOINT_OUT
      * bit[5:6]: 类型 LIBUSB_REQUEST_TYPE_STANDARD, LIBUSB_REQUEST_TYPE_CLASS, LIBUSB_REQUEST_TYPE_VENDOR, LIBUSB_REQUEST_TYPE_RESERVED
@@ -88,7 +89,7 @@ struct IoData {
     ControlRequestData controlRequestData;
 };
 
-struct ActiveUSBConfig {
+struct QTUSB_API ActiveUSBConfig {
     quint8 configuration = 0xFF;
     quint8 interface = 0xFF;
     uint8_t pointNumber = 0xFF;

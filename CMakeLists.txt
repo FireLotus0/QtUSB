@@ -5,6 +5,15 @@ project(QtUsb VERSION 1.0)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+option(BUILD_SHARED_LIBS "Build shared library (DLL/.so) instead of static" ON)
+# 根据选项设置库类型变量
+if(BUILD_SHARED_LIBS)
+    set(LIB_TYPE SHARED)
+else()
+    set(LIB_TYPE STATIC)
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(MSVC)
@@ -18,11 +27,13 @@ if (NOT USB_LIB)
     message(FATAL_ERROR "can`t find libusb")
 endif ()
 
-add_library(QtUsb STATIC
+add_library(${PROJECT_NAME}  ${LIB_TYPE}
     include/QtUsb/datatypes.h
     include/QtUsb/usbdevice.h
     include/QtUsb/usbdevmanager.h
     include/QtUsb/usb_namespace.h
+    include/QtUsb/qtusb_export.h
+
 
     src/datatypes/datatypes.cpp
     src/usbdevmanager/usbdevmanager.cpp
@@ -69,53 +80,70 @@ add_library(QtUsb STATIC
     src/usbdevice/usbdevice.cpp
 )
 
-target_include_directories(QtUsb PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(QtUsb PUBLIC
+target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt5::Core
     ${USB_LIB}
 )
 
-set_target_properties(QtUsb PROPERTIES
-    EXPORT_NAME QtUsb
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    EXPORT_NAME ${PROJECT_NAME}
     DEBUG_POSTFIX "d"
 )
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/QtUsbConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 set(PACKAGE_LIB_INSTALL_DIR "lib")
 configure_package_config_file(
-    "${CMAKE_CURRENT_LIST_DIR}/cmake/QtUsbConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/QtUsbConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/QtUsb
+    "${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
 )
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
-install(TARGETS QtUsb
-    EXPORT QtUsbTargets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-)
+
+if(BUILD_SHARED_LIBS)
+    install(TARGETS ${PROJECT_NAME}
+        EXPORT QtUsbTargets
+        RUNTIME DESTINATION dll        # Windows DLL
+        LIBRARY DESTINATION dll        # Linux/macOS SO
+        ARCHIVE DESTINATION dll        # 动态库有时也有 archive 文件
+        INCLUDES DESTINATION include
+    )
+else()
+    install(TARGETS ${PROJECT_NAME}
+        EXPORT QtUsbTargets
+        ARCHIVE DESTINATION lib        # 静态库
+        RUNTIME DESTINATION lib        # 防止异常
+        LIBRARY DESTINATION lib        # 防止异常
+        INCLUDES DESTINATION include
+    )
+endif()
 
 install(EXPORT QtUsbTargets
     FILE QtUsbTargets.cmake
-    NAMESPACE QtUsb::
-    DESTINATION lib/cmake/QtUsb
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/QtUsbConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/QtUsbConfigVersion.cmake"
-    DESTINATION lib/cmake/QtUsb
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION lib/cmake/${PROJECT_NAME}
 )
+
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE QTUSB_EXPORTS)
+else ()
+    target_compile_definitions(${PROJECT_NAME} PRIVATE QTUSB_STATIC)
+endif ()
 
 #add_subdirectory(test EXCLUDE_FROM_ALL)

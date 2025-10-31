@@ -1,12 +1,13 @@
 #pragma once
 
-#include <qobject.h>
 
 #include "libusb.h"
 #include "usb_namespace.h"
 #include "datatypes.h"
+#include "QtUsb/qtusb_export.h"
 #include <qmap.h>
 #include <qsharedpointer.h>
+#include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
 
@@ -20,7 +21,7 @@ enum class UsbLogLevel {
     CRITICAL
 };
 
-class UsbDevManager : public QObject {
+class QTUSB_API UsbDevManager : public QObject {
     Q_OBJECT
 
 public:
