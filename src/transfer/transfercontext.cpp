@@ -3,9 +3,11 @@
 #include "src/transfer/impl/sync/control/synccontroltransfer.h"
 #include "src/transfer/impl/sync/interrupt/syncintertransfer.h"
 #include <qthread.h>
-#include <qdebug.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
 
 TransferContext::TransferContext(QObject *parent)
         : QObject(parent)
@@ -71,7 +73,7 @@ void TransferWorker::quit() {
 }
 
 TransferWorker::~TransferWorker() {
-    qDebug() << "transfer worker release!";
+    qCDebug(usbCategory) << "transfer worker release!";
 }
 
 QT_USB_NAMESPACE_END

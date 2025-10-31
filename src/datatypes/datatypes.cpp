@@ -1,7 +1,9 @@
 #include "include/QtUsb/datatypes.h"
-#include <qdebug.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+Q_LOGGING_CATEGORY(usbCategory, "usb.category");
 
 bool QT_USB::UsbId::operator==(const QT_USB::UsbId &other) const {
     return pid == other.pid && vid == other.vid;

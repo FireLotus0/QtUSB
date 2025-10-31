@@ -1,9 +1,10 @@
 #include "../../include/QtUsb/usbdevice.h"
 #include "src/iocommand/iocommand.h"
 #include "src/descriptor/usbdescriptor.h"
-#include <qdebug.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
 UsbDevice::UsbDevice(QObject *parent)
     : QObject(parent) {
 }
@@ -22,7 +23,7 @@ UsbDevice::~UsbDevice() {
     if (handle) {
         libusb_close(handle);
     }
-    qDebug() << "UsbDevice::~UsbDevice: " << id;
+    qCDebug(usbCategory) << "UsbDevice::~UsbDevice: " << id;
 }
 
 void UsbDevice::setValid(bool valid) {
@@ -33,7 +34,7 @@ void UsbDevice::setValid(bool valid) {
 
 void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
     if (!validFlag.load(std::memory_order_relaxed)) {
-        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
+        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface != 0xFF) {
@@ -42,7 +43,7 @@ void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
     libusb_set_configuration(handle, usbCfg.interface);
     auto  rt = libusb_claim_interface(handle, newCfg.interface);
     if(rt != 0) {
-        qWarning() << "UsbDevice::setConfiguration: claim interface failed, rt=" << rt << " " << libusb_error_name(rt);
+        qCWarning(usbCategory) << "UsbDevice::setConfiguration: claim interface failed, rt=" << rt << " " << libusb_error_name(rt);
     } else {
         usbCfg = newCfg;
         ioCommand->setConfiguration(newCfg);
@@ -51,11 +52,11 @@ void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
 
 void UsbDevice::read() const {
     if (!validFlag.load(std::memory_order_relaxed)) {
-        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
+        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface == 0xFF) {
-        qWarning() << "UsbDevice::read: usb configuration is not set!";
+        qCWarning(usbCategory) << "UsbDevice::read: usb configuration is not set!";
         return;
     }
     ioCommand->read();
@@ -63,11 +64,11 @@ void UsbDevice::read() const {
 
 void UsbDevice::write(QByteArray &&data) const {
     if (!validFlag.load(std::memory_order_relaxed)) {
-        qWarning() << "UsbDevice::setConfiguration: device is invalid!";
+        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
         return;
     }
     if (usbCfg.interface == 0xFF) {
-        qWarning() << "UsbDevice::write: usb configuration is not set!";
+        qCWarning(usbCategory) << "UsbDevice::write: usb configuration is not set!";
         return;
     }
     ioCommand->write(std::move(data));
@@ -75,13 +76,13 @@ void UsbDevice::write(QByteArray &&data) const {
 
 void UsbDevice::openDevice(UsbId usbId, libusb_device *device) {
     if (handle) {
-        qWarning() << "UsbDevice::openDevice: libusb device already open";
+        qCWarning(usbCategory) << "UsbDevice::openDevice: libusb device already open";
         return;
     }
     id = usbId;
     handle = libusb_open_device_with_vid_pid(nullptr, id.vid, id.pid);
     if (!handle) {
-        qInfo() << "Open device failed: " << id;
+        qCWarning(usbCategory) << "Open device failed: " << id;
         return;
     }
     libusb_set_auto_detach_kernel_driver(handle, 1);

@@ -2,10 +2,8 @@
 
 #include "include/QtUsb//usb_namespace.h"
 #include "../../../include/QtUsb/libusb.h"
-#include <qstring.h>
-#include <qdebug.h>
-
 #include "descriptordata.h"
+#include <qstring.h>
 
 QT_USB_NAMESPACE_BEGIN
 #define DESCRIPTOR_DESCRIPTION(code, description) std::pair<uint8_t, QString>(code, description)

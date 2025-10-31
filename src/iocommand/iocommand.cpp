@@ -1,7 +1,10 @@
 #include "iocommand.h"
-#include <qdebug.h>
+
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
 
 IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device_handle* handle, QObject *parent)
     : descriptorData(descriptorData)
@@ -14,13 +17,13 @@ IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device
 void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
     config = cfg;
     if(!descriptorData.configurations.contains(config.configuration)) {
-        qWarning() << "Invalid configuration: " << config.configuration << " support configurations: " << descriptorData.configurations.keys();
+        qCWarning(usbCategory) << "Invalid configuration: " << config.configuration << " support configurations: " << descriptorData.configurations.keys();
         return;
     } else {
         curCfg =  &descriptorData.configurations[config.configuration];
     }
     if(!curCfg->interfaces.contains(config.interface)) {
-        qWarning() << "Invalid interface: " << config.interface << " support interfaces: " << curCfg->interfaces.keys();
+        qCWarning(usbCategory) << "Invalid interface: " << config.interface << " support interfaces: " << curCfg->interfaces.keys();
         return;
     } else {
         curInterface = &curCfg->interfaces[config.interface];
@@ -55,7 +58,7 @@ void IoCommand::makeIoData(TransferDirection direction, QByteArray &&data) {
     ioData.handle = handle;
     ioData.address = config.pointNumber | (direction == TransferDirection::HOST_TO_DEVICE ? LIBUSB_ENDPOINT_OUT : LIBUSB_ENDPOINT_IN);
     if(!curInterface->endpoints.contains(ioData.address)) {
-        qWarning() << "Invalid point address: " << ioData.address << " point number:" << config.pointNumber << " support point addresses: "
+        qCWarning(usbCategory) << "Invalid point address: " << ioData.address << " point number:" << config.pointNumber << " support point addresses: "
             << curInterface->endpoints.keys();
         return;
     }
@@ -174,7 +177,7 @@ void IoCommand::initSpeedTimer() {
             speed = (bytesCounter * 1.0) / 1024;
             speedUnit = "kb/s";
         }
-        qInfo().noquote() << "read speed: " << QString::number(speed, 'f', 3) << speedUnit;
+        qCInfo(usbCategory).noquote() << "read speed: " << QString::number(speed, 'f', 3) << speedUnit;
         bytesCounter = 0;
     });
 }

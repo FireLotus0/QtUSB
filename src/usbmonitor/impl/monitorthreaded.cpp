@@ -1,9 +1,10 @@
 #include "monitorthreaded.h"
 #include "src/usbmonitor/usbmonitor.h"
-#include <qdebug.h>
 #include <QCoreApplication>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
 MonitorThreaded::MonitorThreaded(UsbMonitor *usbMonitor, QObject *parent)
     : MonitorBase(usbMonitor, parent) {
     workThr = new QThread(this);
@@ -66,7 +67,7 @@ void MonitorWorker::onStartMonitor() {
                     }
                 }
             } else {
-                qDebug() << libusb_error_name(ret);
+                qCWarning(usbCategory) << libusb_error_name(ret);
             }
         }
         for (auto id: searchCache.keys()) {

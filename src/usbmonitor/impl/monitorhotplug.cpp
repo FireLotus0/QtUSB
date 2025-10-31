@@ -1,8 +1,10 @@
 #include "monitorhotplug.h"
 #include "src/usbmonitor/usbmonitor.h"
-#include <qdebug.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
 
 MonitorHotplug::MonitorHotplug(UsbMonitor* usbMonitor, QObject *parent) : MonitorBase(usbMonitor, parent) {
 }
@@ -21,7 +23,7 @@ void MonitorHotplug::addMonitorId(UsbId id) {
     auto rc = libusb_hotplug_register_callback(nullptr, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, id.vid, id.pid,
                                                LIBUSB_HOTPLUG_MATCH_ANY, hotplugCallback, this, &handle);
     if (rc != LIBUSB_SUCCESS) {
-        qWarning() << "Register HotPlug failed: " << libusb_error_name(rc);
+        qCWarning(usbCategory) << "Register HotPlug failed: " << libusb_error_name(rc);
     } else {
         callbackHandles.insert(id, handle);
     }
@@ -47,7 +49,7 @@ int hotplugCallback(libusb_context *context, libusb_device *dev, libusb_hotplug_
         } else if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT) {
             monitorHotPlug->usbMonitor->deviceDetached({desc.idProduct, desc.idVendor});
         } else {
-            qWarning() << "HotPlug callback returned an invalid event";
+            qCWarning(usbCategory) << "HotPlug callback returned an invalid event";
         }
     }
     return 0;

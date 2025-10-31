@@ -1,7 +1,10 @@
 #include "monitorbase.h"
-#include <qdebug.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
+
 MonitorBase::MonitorBase(UsbMonitor *usbMonitor, QObject *parent)
     : QObject(parent)
     , usbMonitor(usbMonitor) {
@@ -12,11 +15,11 @@ MonitorBase::~MonitorBase() {
 
 void MonitorBase::startMonitor() {
     monitorFlag = 1;
-    qDebug() << "Monitor started";
+    qCDebug(usbCategory) << "Monitor started";
 }
 
 void MonitorBase::stopMonitor() {
-    qDebug() << "Monitor stopped";
+    qCDebug(usbCategory) << "Monitor stopped";
     monitorFlag = 0;
 }
 

@@ -1,8 +1,11 @@
 #include "descriptorbase.h"
-
 #include <qtextstream.h>
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
+
 DescriptorBase::DescriptorBase(libusb_device *device)
     : device(device)
 {
@@ -13,7 +16,7 @@ DescriptorBase::~DescriptorBase() {
 }
 
 void DescriptorBase::printInfo() const {
-    qInfo().noquote() << getContent();
+    qCInfo(usbCategory).noquote() << getContent();
 }
 
 void DescriptorBase::releaseChildren() {

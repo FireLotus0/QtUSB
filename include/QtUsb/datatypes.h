@@ -4,9 +4,12 @@
 
 #include "usb_namespace.h"
 #include "QtUsb/libusb.h"
+#include <qloggingcategory.h>
 #include <QtGlobal>
 
 QT_USB_NAMESPACE_BEGIN
+
+Q_DECLARE_LOGGING_CATEGORY(usbCategory)
 
 struct UsbId {
     quint16 pid;

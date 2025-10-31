@@ -1,7 +1,10 @@
 #include "devicedesc.h"
 #include "src/descriptor/configuration/configdesc.h"
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
 
 DeviceDesc::DeviceDesc(libusb_device *device, DescriptorData* descriptorData)
     : DescriptorBase(device)
@@ -17,7 +20,7 @@ void DeviceDesc::resolveInfo() {
     }
     auto rc = libusb_get_device_descriptor(device, &desc);
     if (rc != LIBUSB_SUCCESS) {
-        qWarning() << "Resolve device descriptor failed: " << libusb_error_name(rc);
+        qCWarning(usbCategory) << "Resolve device descriptor failed: " << libusb_error_name(rc);
     } else {
         auto speed = libusb_get_device_speed(device);
         content += "USB<PID:" + QString::number(desc.idProduct) + " VID:" + QString::number(desc.idVendor) + ">" + "\n";

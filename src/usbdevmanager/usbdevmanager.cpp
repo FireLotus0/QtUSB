@@ -1,7 +1,7 @@
-#include "../../include/QtUsb/usbdevmanager.h"
+#include "include/QtUsb/usbdevmanager.h"
 #include "src/usbmonitor/usbmonitor.h"
-#include "../../include/QtUsb/usbdevice.h"
-#include <qdebug.h>
+#include "include/QtUsb/usbdevice.h"
+#include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN
 
@@ -9,7 +9,7 @@ UsbDevManager::UsbDevManager(QObject *parent)
 {
     libusb_context *ctx = nullptr;
     if (libusb_init(&ctx) < 0) {
-        qWarning() << "libusb_init failed";
+        qCCritical(usbCategory) << "libusb_init failed";
     } else {
         qRegisterMetaType<UsbId>("UsbId");
         qRegisterMetaType<IoData>("RequestData");
@@ -64,6 +64,22 @@ void UsbDevManager::onDeviceDetached(UsbId id) {
     devices[id]->setValid(false);
     devices.remove(id);
     emit deviceDetached(id);
+}
+
+void UsbDevManager::setLogLevel(UsbLogLevel level) {
+    QString rule = "usb.category.debug=true";
+    switch((int)level) {
+        case (int)UsbLogLevel::INFO: rule =  "usb.category.debug=false\n"
+                                             "usb.category.info=true"; break;
+        case (int)UsbLogLevel::WARNING: rule =  "usb.category.debug=false\n"
+                                                "usb.category.info=false\n"
+                                                "usb.category.warning=true";  break;
+        case (int)UsbLogLevel::CRITICAL: rule =  "usb.category.debug=false\n"
+                                                 "usb.category.info=false\n"
+                                                 "usb.category.warning=false\n"
+                                                 "usb.category.critical=true"; break;
+    }
+    QLoggingCategory::setFilterRules(rule);
 }
 
 

@@ -1,6 +1,11 @@
 #include "configdesc.h"
 #include "src/descriptor/interface/interfacedesc.h"
+
+#include <qloggingcategory.h>
+
 QT_USB_NAMESPACE_BEGIN
+
+const QLoggingCategory &usbCategory();
 
 ConfigDesc::ConfigDesc(libusb_device *device, int index, DescriptorData* descriptorData)
     : DescriptorBase(device)
@@ -18,7 +23,7 @@ void ConfigDesc::resolveInfo() {
     }
     auto rc = libusb_get_config_descriptor(device, configIndex, &desc);
     if(rc != LIBUSB_SUCCESS) {
-        qWarning() << "Get config descriptor failed: config index:" << configIndex;
+        qCWarning(usbCategory) << "Get config descriptor failed: config index:" << configIndex;
     } else {
         content += genContentLine("Configuration #", QString::number(configIndex), " ID=", QString::number(desc->bConfigurationValue));
         content += genContentLine("Interface Counts: ", QString::number(desc->bNumInterfaces));

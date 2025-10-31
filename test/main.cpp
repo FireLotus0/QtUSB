@@ -5,6 +5,8 @@
 #include <qthread.h>
 #include <qtimer.h>
 
+#include <QLoggingCategory>
+
 USING_QT_USB_NAMESPACE
 
 class UsbUser : public QObject {
@@ -56,7 +58,7 @@ private:
 int main(int argc, char *argv[]) {
     QCoreApplication application(argc, argv);
 
-    UsbDevManager::instance();
+    UsbDevManager::instance().setLogLevel(QT_USB::UsbLogLevel::WARNING);
     UsbUser user;
 
     QObject::connect(&UsbDevManager::instance(), &UsbDevManager::deviceAttached, &user, &UsbUser::onDeviceAttached);
