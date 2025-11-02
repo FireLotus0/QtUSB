@@ -1,5 +1,5 @@
 #include "configdesc.h"
-#include "src/descriptor/interface/interfacedesc.h"
+#include "descriptor/interface/interfacedesc.h"
 
 #include <qloggingcategory.h>
 

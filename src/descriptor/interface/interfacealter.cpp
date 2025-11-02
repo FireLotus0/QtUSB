@@ -1,5 +1,5 @@
 #include "interfacealter.h"
-#include  "src/descriptor/endpoint/endpointdesc.h"
+#include  "descriptor/endpoint/endpointdesc.h"
 
 QT_USB_NAMESPACE_BEGIN
 

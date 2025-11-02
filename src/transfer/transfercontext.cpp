@@ -1,7 +1,7 @@
 #include "transfercontext.h"
-#include "src/transfer/impl/sync/bulk/syncbulktransfer.h"
-#include "src/transfer/impl/sync/control/synccontroltransfer.h"
-#include "src/transfer/impl/sync/interrupt/syncintertransfer.h"
+#include "transfer/impl/sync/bulk/syncbulktransfer.h"
+#include "transfer/impl/sync/control/synccontroltransfer.h"
+#include "transfer/impl/sync/interrupt/syncintertransfer.h"
 #include <qthread.h>
 #include <qloggingcategory.h>
 

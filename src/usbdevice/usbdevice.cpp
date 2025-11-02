@@ -1,6 +1,6 @@
-#include "../../include/QtUsb/usbdevice.h"
-#include "src/iocommand/iocommand.h"
-#include "src/descriptor/usbdescriptor.h"
+#include "QtUsb/usbdevice.h"
+#include "iocommand/iocommand.h"
+#include "descriptor/usbdescriptor.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

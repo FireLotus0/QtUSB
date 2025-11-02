@@ -1,5 +1,5 @@
 #pragma once
-#include "src/descriptor/descriptorbase/descriptorbase.h"
+#include "descriptor/descriptorbase/descriptorbase.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN

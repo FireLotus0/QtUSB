@@ -1,5 +1,5 @@
 #include "monitorthreaded.h"
-#include "src/usbmonitor/usbmonitor.h"
+#include "usbmonitor/usbmonitor.h"
 #include <QCoreApplication>
 #include <qloggingcategory.h>
 

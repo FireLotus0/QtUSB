@@ -1,5 +1,5 @@
 #pragma once
-#include "src/transfer/impl/strategybase.h"
+#include "transfer/impl/strategybase.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN

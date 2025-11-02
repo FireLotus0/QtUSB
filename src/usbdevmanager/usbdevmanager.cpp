@@ -1,6 +1,6 @@
-#include "include/QtUsb/usbdevmanager.h"
-#include "src/usbmonitor/usbmonitor.h"
-#include "include/QtUsb/usbdevice.h"
+#include "QtUsb/usbdevmanager.h"
+#include "usbmonitor/usbmonitor.h"
+#include "QtUsb/usbdevice.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

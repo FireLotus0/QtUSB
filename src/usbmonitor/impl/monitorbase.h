@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../include/QtUsb/datatypes.h"
+#include "QtUsb/datatypes.h"
 #include <qobject.h>
 #include <qatomic.h>
 

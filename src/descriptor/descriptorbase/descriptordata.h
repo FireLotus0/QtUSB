@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../include/QtUsb/usb_namespace.h"
-#include "../../../include/QtUsb/datatypes.h"
+#include "QtUsb/usb_namespace.h"
+#include "QtUsb/datatypes.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN

@@ -1,4 +1,4 @@
-#include "include/QtUsb/datatypes.h"
+#include "QtUsb/datatypes.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "include/QtUsb/usb_namespace.h"
-#include "../../include/QtUsb/libusb.h"
-#include "src/transfer/transfercontext.h"
-#include "src/descriptor/descriptorbase/descriptordata.h"
+#include "QtUsb/usb_namespace.h"
+#include "QtUsb/libusb.h"
+#include "transfer/transfercontext.h"
+#include "descriptor/descriptorbase/descriptordata.h"
 #include <qobject.h>
 #include <qtimer.h>
 #include <QQueue>

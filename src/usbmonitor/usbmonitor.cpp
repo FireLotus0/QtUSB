@@ -1,7 +1,7 @@
 #include "usbmonitor.h"
-#include "../../include/QtUsb/libusb.h"
-#include "src/usbmonitor/impl/monitorthreaded.h"
-#include "src/usbmonitor/impl/monitorhotplug.h"
+#include "QtUsb/libusb.h"
+#include "usbmonitor/impl/monitorthreaded.h"
+#include "usbmonitor/impl/monitorhotplug.h"
 
 QT_USB_NAMESPACE_BEGIN
 

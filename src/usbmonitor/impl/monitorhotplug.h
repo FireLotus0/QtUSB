@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/usbmonitor/impl/monitorbase.h"
-#include "../../../include/QtUsb/libusb.h"
+#include "usbmonitor/impl/monitorbase.h"
+#include "QtUsb/libusb.h"
 #include <qmap.h>
 
 QT_USB_NAMESPACE_BEGIN

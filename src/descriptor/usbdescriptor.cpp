@@ -1,5 +1,5 @@
 #include "usbdescriptor.h"
-#include "src/descriptor/device/devicedesc.h"
+#include "descriptor/device/devicedesc.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

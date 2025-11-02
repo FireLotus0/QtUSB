@@ -1,5 +1,5 @@
 #include "monitorhotplug.h"
-#include "src/usbmonitor/usbmonitor.h"
+#include "usbmonitor/usbmonitor.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

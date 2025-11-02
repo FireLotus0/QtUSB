@@ -1,13 +1,12 @@
 #pragma once
 
 #include "monitorbase.h"
+#include "QtUsb/libusb.h"
+#include "usbmonitor/usbmonitor.h"
 #include <qobject.h>
 #include <qthread.h>
 #include <qmutex.h>
 #include <qmap.h>
-
-#include "../../../include/QtUsb/libusb.h"
-#include "src/usbmonitor/usbmonitor.h"
 
 QT_USB_NAMESPACE_BEGIN
 class MonitorWorker;

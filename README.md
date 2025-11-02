@@ -37,16 +37,6 @@
 
 说明如何集成库：
 
-- 编译依赖(以下为Linux平台，windows使用IDE进行构建即可)
-```
-git clone git@github.com:FireLotus0/QtUSB.git
-cd QtUSB
-mkdir build
-cd build
-cmake -S ../ -B . -DCMAKE_PREFIX_PATH="/opt/Qt/5.15.2/gcc_64;/usr/local/libusb" -DCMAKE_INSTALL_PREFIX=/usr/local/QtUSB
-make
-make install
-```
 - 如何将封装库加入你的 Qt 项目
 ```
 find_package(QtUsb REQUIRED)
@@ -80,6 +70,8 @@ target_link_libraries (${PROJECT_NAME} PUBLIC QtUsb::QtUsb)
 #include <qcoreapplication.h>
 #include <qthread.h>
 #include <qtimer.h>
+
+#include <QLoggingCategory>
 
 USING_QT_USB_NAMESPACE
 
@@ -123,6 +115,7 @@ private:
             qDebug() << "usb error: " << errorString;
         });
     }
+
 private:
     QSharedPointer<UsbDevice> device;
     QTimer readUsbTimer;
@@ -131,7 +124,7 @@ private:
 int main(int argc, char *argv[]) {
     QCoreApplication application(argc, argv);
 
-    UsbDevManager::instance();
+    UsbDevManager::instance().setLogLevel(QT_USB::UsbLogLevel::WARNING);
     UsbUser user;
 
     QObject::connect(&UsbDevManager::instance(), &UsbDevManager::deviceAttached, &user, &UsbUser::onDeviceAttached);
@@ -145,5 +138,6 @@ int main(int argc, char *argv[]) {
 }
 
 #include "main.moc"
+
 
 ```

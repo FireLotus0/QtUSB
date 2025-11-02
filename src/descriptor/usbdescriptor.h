@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../include/QtUsb/libusb.h"
-#include "include/QtUsb/usb_namespace.h"
-#include "src/descriptor/descriptorbase/descriptordata.h"
+#include "QtUsb/libusb.h"
+#include "QtUsb/usb_namespace.h"
+#include "descriptor/descriptorbase/descriptordata.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
