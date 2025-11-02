@@ -90,11 +90,11 @@ struct IoData {
 };
 
 struct QTUSB_API ActiveUSBConfig {
-    quint8 configuration = 0xFF;
-    quint8 interface = 0xFF;
-    uint8_t pointNumber = 0xFF;
-    int readCacheSize = 1024;
-    bool queuedCommands{false};
+    quint8 configuration = 0xFF;    // 使用的配置ID
+    quint8 interface = 0xFF;        // 接口
+    uint8_t pointNumber = 0xFF;     // 端点
+    int readCacheSize = 1024;       // 读取缓冲区大小
+    bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
 };
 
 

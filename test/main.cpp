@@ -2,10 +2,7 @@
 #include "QtUsb/usbdevice.h"
 #include <qdebug.h>
 #include <qcoreapplication.h>
-#include <qthread.h>
 #include <qtimer.h>
-
-#include <QLoggingCategory>
 
 USING_QT_USB_NAMESPACE
 
@@ -22,22 +19,18 @@ public:
 
 public slots:
     void onDeviceAttached(UsbId id) {
-        QTimer::singleShot(100, [&, id] {
-            device = UsbDevManager::instance().getDevice(id);
-            if (device) {
-                device->setSpeedPrintEnable(true);
-                initUsbSig();
-                device->setConfiguration({1, 0, 1, 8});
-                readUsbTimer.start();
-            }
-        });
+        device = UsbDevManager::instance().getDevice(id);
+        if (device) {
+            device->setSpeedPrintEnable(true);
+            initUsbSig();
+            device->setConfiguration({1, 0, 1, 8});
+            readUsbTimer.start();
+        }
     }
 
     void onDeviceDetached(UsbId id) {
-        QTimer::singleShot(200, [&] {
-            readUsbTimer.stop();
-            device.reset();
-        });
+        readUsbTimer.stop();
+        device.reset();
     }
 
 private:
