@@ -10,13 +10,16 @@ MonitorHotplug::MonitorHotplug(UsbMonitor* usbMonitor, QObject *parent) : Monito
 }
 
 MonitorHotplug::~MonitorHotplug() {
-    for (auto handle: callbackHandles.values()) {
+    for (auto handle: idMonitorCbHandles.values()) {
+        libusb_hotplug_deregister_callback(nullptr, handle);
+    }
+    for (auto handle: classMonitorCbHandles.values()) {
         libusb_hotplug_deregister_callback(nullptr, handle);
     }
 }
 
 void MonitorHotplug::addMonitorId(UsbId id) {
-    if (callbackHandles.contains(id)) {
+    if (idMonitorCbHandles.contains(id)) {
         return;
     }
     libusb_hotplug_callback_handle handle;
@@ -25,16 +28,40 @@ void MonitorHotplug::addMonitorId(UsbId id) {
     if (rc != LIBUSB_SUCCESS) {
         qCWarning(usbCategory) << "Register HotPlug failed: " << libusb_error_name(rc);
     } else {
-        callbackHandles.insert(id, handle);
+        idMonitorCbHandles.insert(id, handle);
     }
 }
 
 void MonitorHotplug::removeMonitorId(UsbId id) {
-    if (!callbackHandles.contains(id)) {
+    if (!idMonitorCbHandles.contains(id)) {
         return;
     }
-    libusb_hotplug_deregister_callback(nullptr, callbackHandles.value(id));
-    callbackHandles.remove(id);
+    libusb_hotplug_deregister_callback(nullptr, idMonitorCbHandles.value(id));
+    idMonitorCbHandles.remove(id);
+}
+
+void MonitorHotplug::addMonitorClass(uint8_t devClass) {
+    if(classMonitorCbHandles.contains(devClass)) {
+        return;
+    }
+    libusb_hotplug_callback_handle handle;
+    auto rc = libusb_hotplug_register_callback(nullptr, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+                                               0, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY,
+                                               devClass, hotplugCallback, this, &handle);
+    if (rc != LIBUSB_SUCCESS) {
+        qCWarning(usbCategory) << "addMonitorClass(): Register HotPlug failed: " << libusb_error_name(rc);
+    } else {
+        classMonitorCbHandles.insert(devClass, handle);
+    }
+
+}
+
+void MonitorHotplug::removeMonitorClass(uint8_t devClass) {
+    if(!classMonitorCbHandles.contains(devClass)) {
+        return;
+    }
+    libusb_hotplug_deregister_callback(nullptr, classMonitorCbHandles.value(devClass));
+    classMonitorCbHandles.remove(devClass);
 }
 
 int hotplugCallback(libusb_context *context, libusb_device *dev, libusb_hotplug_event event, void *user_data) {

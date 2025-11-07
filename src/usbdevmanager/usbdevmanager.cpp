@@ -15,6 +15,7 @@ UsbDevManager::UsbDevManager(QObject *parent)
         qRegisterMetaType<IoData>("RequestData");
         qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap");
         qRegisterMetaType<IoData>("IoData");
+        qRegisterMetaType<uint8_t>("uint8_t");
 
         monitor = new UsbMonitor(parent);
         connect(monitor, &UsbMonitor::deviceAttached, this, &UsbDevManager::onDeviceAttached);
@@ -54,8 +55,7 @@ QSharedPointer<UsbDevice> UsbDevManager::getDevice(UsbId id) const {
 
 void UsbDevManager::onDeviceAttached(UsbId id, LibUsbDevWrap dev) {
     Q_ASSERT(!devices.contains(id));
-    devices[id] = QSharedPointer<UsbDevice>(new UsbDevice(this));
-    devices[id]->openDevice(id, dev.device);
+    devices[id] = QSharedPointer<UsbDevice>(new UsbDevice(id, dev.device, this));
     emit deviceAttached(id);
 }
 
@@ -80,6 +80,14 @@ void UsbDevManager::setLogLevel(UsbLogLevel level) {
                                                  "usb.category.critical=true"; break;
     }
     QLoggingCategory::setFilterRules(rule);
+}
+
+void UsbDevManager::addMonitorClass(uint8_t devClass) {
+    monitor->addMonitorClass(devClass);
+}
+
+void UsbDevManager::removeMonitorClass(uint8_t devClass) {
+    monitor->removeMonitorClass(devClass);
 }
 
 

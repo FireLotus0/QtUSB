@@ -40,6 +40,18 @@ public:
     void removeMonitorId(UsbId id);
 
     /**
+     * @brief 添加需要监听的设备类别
+     * @param devClass 设备类别
+     */
+    void addMonitorClass(uint8_t devClass);
+
+    /**
+     * @brief 取消对指定设备类别的监听
+     * @param devClass 设备类别
+     */
+    void removeMonitorClass(uint8_t devClass);
+
+    /**
      * @brief 通过ID获取设备指针
      * @param id
      * @return

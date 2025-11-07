@@ -40,11 +40,22 @@ void MonitorThreaded::stopMonitor() {
     workerEnable.storeRelaxed(0);
 }
 
+void MonitorThreaded::addMonitorClass(uint8_t devClass) {
+    worker->addMonitorClass(devClass);
+}
+
+void MonitorThreaded::removeMonitorClass(uint8_t devClass) {
+    worker->removeMonitorClass(devClass);
+}
+
 MonitorWorker::MonitorWorker(UsbMonitor* usbMonitor, QAtomicInt &workerEnable, QAtomicInt &monitorFlag, QObject *parent)
     : QObject(parent), workerEnable(workerEnable), monitorFlag(monitorFlag), usbMonitor(usbMonitor) {
     connect(this, &MonitorWorker::startMonitor, this, &MonitorWorker::onStartMonitor);
-    connect(this, &MonitorWorker::addMonitorId, this, &MonitorWorker::onAddMonitorId, Qt::QueuedConnection);
+    connect(this, &MonitorWorker::addMonitorId, this, &MonitorWorker::onAddMonitorId);
     connect(this, &MonitorWorker::removeMonitorId, this, &MonitorWorker::onRemoveMonitorId);
+
+    connect(this, &MonitorWorker::addMonitorClass, this, &MonitorWorker::onAddMonitorClass);
+    connect(this, &MonitorWorker::removeMonitorClass, this, &MonitorWorker::onRemoveMonitorClass);
 }
 
 void MonitorWorker::onStartMonitor() {
@@ -58,6 +69,13 @@ void MonitorWorker::onStartMonitor() {
             if (ret >= 0) {
                 usbIdTemp.pid = descriptor.idProduct;
                 usbIdTemp.vid = descriptor.idVendor;
+
+                if(monitorClasses.contains(descriptor.bDeviceClass)) {
+                    if(!monitorIds.contains(usbIdTemp)) {
+                        monitorIds[usbIdTemp] = false;
+                    }
+                }
+
                 if (monitorIds.contains(usbIdTemp)) {
                     searchCache[usbIdTemp] = true;
                     if (!monitorIds[usbIdTemp]) {
@@ -78,36 +96,55 @@ void MonitorWorker::onStartMonitor() {
         }
         // libusb_free_device_list(devLists, 1);
         updateMonitorIds();
+        updateMonitorClassed();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
         QThread::msleep(500);
     }
 }
 
 void MonitorWorker::onAddMonitorId(QT_USB::UsbId id) {
-    addCache.append(id);
+    addIdCache.append(id);
 }
 
 void MonitorWorker::onRemoveMonitorId(QT_USB::UsbId id) {
-    removeCache.append(id);
+    removeIdCache.append(id);
 }
 
 void MonitorWorker::updateMonitorIds() {
-    if (!addCache.isEmpty()) {
-        for (const auto &addId: addCache) {
+    if (!addIdCache.isEmpty()) {
+        for (const auto &addId: addIdCache) {
             if (!monitorIds.contains(addId)) {
                 monitorIds[addId] = false;
             }
         }
-        addCache.clear();
+        addIdCache.clear();
     }
-    if (!removeCache.isEmpty()) {
-        for (const auto &removeId: removeCache) {
+    if (!removeIdCache.isEmpty()) {
+        for (const auto &removeId: removeIdCache) {
             if (monitorIds.contains(removeId)) {
                 monitorIds.remove(removeId);
             }
         }
-        removeCache.clear();
+        removeIdCache.clear();
     }
 }
+
+void MonitorWorker::updateMonitorClassed() {
+    for(auto devClass : addClassCache) {
+        monitorClasses.insert(devClass);
+    }
+    for(auto devClass : removeClassCache) {
+        monitorClasses.remove(devClass);
+    }
+}
+
+void MonitorWorker::onAddMonitorClass(uint8_t devClass) {
+    addClassCache.append(devClass);
+}
+
+void MonitorWorker::onRemoveMonitorClass(uint8_t devClass) {
+    removeClassCache.removeAll(devClass);
+}
+
 
 QT_USB_NAMESPACE_END

@@ -21,6 +21,10 @@ public:
 
     void removeMonitorId(QT_USB::UsbId id) override;
 
+    void addMonitorClass(uint8_t devClass) override;
+
+    void removeMonitorClass(uint8_t devClass) override;
+
     void startMonitor() override;
 
     void stopMonitor() override;
@@ -40,14 +44,20 @@ signals:
     void startMonitor();
     void addMonitorId(QT_USB::UsbId id);
     void removeMonitorId(QT_USB::UsbId id);
+    void addMonitorClass(uint8_t devClass);
+    void removeMonitorClass(uint8_t devClass);
 
 private slots:
     void onStartMonitor();
     void onAddMonitorId(QT_USB::UsbId id);
     void onRemoveMonitorId(QT_USB::UsbId id);
+    void onAddMonitorClass(uint8_t devClass);
+    void onRemoveMonitorClass(uint8_t devClass);
 
 private:
     void updateMonitorIds();
+    void updateMonitorClassed();
+
 private:
     UsbMonitor* usbMonitor;
     UsbId usbIdTemp;
@@ -55,8 +65,11 @@ private:
     QAtomicInt &workerEnable;
     QAtomicInt &monitorFlag;
     libusb_device_descriptor descriptor;
-    QList<UsbId>  addCache, removeCache;
+    QList<UsbId>  addIdCache, removeIdCache;
     QMap<UsbId, bool> monitorIds, searchCache;
+
+    QList<uint8_t> addClassCache, removeClassCache;
+    QSet<uint8_t> monitorClasses;
 };
 
 QT_USB_NAMESPACE_END

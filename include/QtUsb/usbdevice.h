@@ -13,7 +13,7 @@ class QTUSB_API UsbDevice : public QObject {
     Q_OBJECT
 
 public:
-    explicit UsbDevice(QObject *parent = nullptr);
+    explicit UsbDevice(UsbId usbId, libusb_device *device, QObject *parent = nullptr);
 
     ~UsbDevice();
 
@@ -53,7 +53,7 @@ private:
      * @param usbId
      * @param device
      */
-    void openDevice(UsbId usbId, libusb_device *device);
+    void openDevice();
 
 signals:
     void readFinished(const QByteArray &data);
@@ -61,12 +61,12 @@ signals:
     void errorOccurred(int errorCode, const QString& errorString);
 
 private:
-    friend class UsbDevManager;
     std::atomic<bool> validFlag{false};
     UsbId id;
-    UsbDescriptor* descriptor;
+    libusb_device* device{nullptr};
+    UsbDescriptor* descriptor{nullptr};
     ActiveUSBConfig usbCfg;
-    IoCommand *ioCommand;
+    IoCommand *ioCommand{nullptr};
     libusb_device_handle *handle{nullptr};
 };
 

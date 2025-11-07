@@ -21,6 +21,10 @@ void InterfaceAlter::resolveInfo() {
     content += genContentLine("EndPoint Counts:", QString::number(desc.bNumEndpoints));
     InterfaceData interfaceData;
     interfaceData.interfaceNumber = desc.bInterfaceNumber;
+    interfaceData.interfaceProtocol = desc.bInterfaceProtocol;
+    interfaceData.interfaceSubClass = desc.bInterfaceSubClass;
+    interfaceData.interfaceClass = desc.bInterfaceClass;
+
     configurationData->interfaces.insert(desc.bInterfaceNumber, interfaceData);
     for(int i = 0; i < desc.bNumEndpoints; i++) {
         auto endPoint = new EndPointDesc(device, desc.endpoint[i], &configurationData->interfaces[desc.bInterfaceNumber]);

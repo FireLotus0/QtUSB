@@ -5,8 +5,11 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-UsbDevice::UsbDevice(QObject *parent)
-    : QObject(parent) {
+UsbDevice::UsbDevice(UsbId usbId, libusb_device *device, QObject *parent)
+    : QObject(parent)
+    , id(usbId)
+    , device(device)
+{
 }
 
 
@@ -33,6 +36,8 @@ void UsbDevice::setValid(bool valid) {
 }
 
 void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
+    openDevice();
+
     if (!validFlag.load(std::memory_order_relaxed)) {
         qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
         return;
@@ -74,12 +79,14 @@ void UsbDevice::write(QByteArray &&data) const {
     ioCommand->write(std::move(data));
 }
 
-void UsbDevice::openDevice(UsbId usbId, libusb_device *device) {
+void UsbDevice::openDevice() {
+    if(validFlag.load(std::memory_order_relaxed)) {
+        return;
+    }
     if (handle) {
         qCWarning(usbCategory) << "UsbDevice::openDevice: libusb device already open";
         return;
     }
-    id = usbId;
     handle = libusb_open_device_with_vid_pid(nullptr, id.vid, id.pid);
     if (!handle) {
         qCWarning(usbCategory) << "Open device failed: " << id;

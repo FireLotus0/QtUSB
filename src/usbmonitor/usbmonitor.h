@@ -18,6 +18,10 @@ public:
 
     void removeMonitorId(UsbId id);
 
+    void addMonitorClass(uint8_t devClass);
+
+    void removeMonitorClass(uint8_t devClass);
+
     void start() const;
 
     void stop() const;

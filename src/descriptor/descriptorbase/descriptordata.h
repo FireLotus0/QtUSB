@@ -20,6 +20,9 @@ struct EndPointData {
 
 struct InterfaceData {
     quint8 interfaceNumber;
+    quint8 interfaceClass;
+    quint8 interfaceProtocol;
+    quint8 interfaceSubClass;
     QMap<quint8, EndPointData> endpoints;
 };
 
@@ -30,6 +33,7 @@ struct ConfigurationData {
 
 struct DescriptorData {
     bool fullDuplexSupported{false};
+    DevClassType devClassType;
     QMap<quint8, ConfigurationData> configurations;
 };
 

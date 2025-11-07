@@ -97,6 +97,11 @@ struct QTUSB_API ActiveUSBConfig {
     bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
 };
 
+// 设备类别
+enum class DevClassType {
+    MASS_STORAGE,   // U盘
+};
+
 
 QT_USB_NAMESPACE_END
 

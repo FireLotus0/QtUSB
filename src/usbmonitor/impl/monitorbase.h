@@ -16,6 +16,9 @@ public:
     virtual void addMonitorId(UsbId id) = 0;
     virtual void removeMonitorId(UsbId id) = 0;
 
+    virtual void addMonitorClass(uint8_t devClass) = 0;
+    virtual void removeMonitorClass(uint8_t devClass) = 0;
+
     virtual void startMonitor();
     virtual void stopMonitor();
 
