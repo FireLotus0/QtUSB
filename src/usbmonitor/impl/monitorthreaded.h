@@ -21,9 +21,9 @@ public:
 
     void removeMonitorId(QT_USB::UsbId id) override;
 
-    void addMonitorClass(uint8_t devClass) override;
+    void addMonitorClass(DeviceType deviceType) override;
 
-    void removeMonitorClass(uint8_t devClass) override;
+    void removeMonitorClass(DeviceType deviceType) override;
 
     void startMonitor() override;
 
@@ -44,15 +44,15 @@ signals:
     void startMonitor();
     void addMonitorId(QT_USB::UsbId id);
     void removeMonitorId(QT_USB::UsbId id);
-    void addMonitorClass(uint8_t devClass);
-    void removeMonitorClass(uint8_t devClass);
+    void addMonitorClass(DeviceType deviceType);
+    void removeMonitorClass(DeviceType deviceType);
 
 private slots:
     void onStartMonitor();
     void onAddMonitorId(QT_USB::UsbId id);
     void onRemoveMonitorId(QT_USB::UsbId id);
-    void onAddMonitorClass(uint8_t devClass);
-    void onRemoveMonitorClass(uint8_t devClass);
+    void onAddMonitorClass(DeviceType deviceType);
+    void onRemoveMonitorClass(DeviceType deviceType);
 
 private:
     void updateMonitorIds();
@@ -68,8 +68,13 @@ private:
     QList<UsbId>  addIdCache, removeIdCache;
     QMap<UsbId, bool> monitorIds, searchCache;
 
-    QList<uint8_t> addClassCache, removeClassCache;
-    QSet<uint8_t> monitorClasses;
+    QList<DeviceType> addClassCache, removeClassCache;
+    QSet<DeviceType> monitorClasses;
 };
+
+inline uint qHash(DeviceType key, uint seed = 0) noexcept
+{
+    return ::qHash(static_cast<quint64>(key), seed);
+}
 
 QT_USB_NAMESPACE_END

@@ -31,6 +31,9 @@ void DeviceDesc::resolveInfo() {
         if((desc.bcdUSB >> 8) >= 3) {
             descriptorData->fullDuplexSupported = true;
         }
+        descriptorData->deviceClass = desc.bDeviceClass;
+        descriptorData->deviceSubClass = desc.bDeviceSubClass;
+        descriptorData->deviceProtocol = desc.bDeviceProtocol;
         for(int i= 0; i < desc.bNumConfigurations; i++) {
             auto child = new ConfigDesc(device, i, descriptorData);
             child->resolveInfo();

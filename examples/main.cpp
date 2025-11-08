@@ -20,28 +20,30 @@ public:
 
 public slots:
     void onDeviceAttached(UsbId id) {
-        device = UsbDevManager::instance().getDevice(id);
-        if (device) {
-            initUsbSig();
-            device->setConfiguration({1, 0, 1, 8});
-            device->setSpeedPrintEnable(true);
-            readUsbTimer.start();
-        }
+        qDebug() << "Device attached";
+        // device = UsbDevManager::instance().getDevice(id);
+        // if (device) {
+        //     initUsbSig();
+        //     device->setConfiguration({1, 0, 1, 8});
+        //     device->setSpeedPrintEnable(true);
+        //     readUsbTimer.start();
+        // }
     }
 
     void onDeviceDetached(UsbId id) {
-        readUsbTimer.stop();
-        device.reset();
+        qDebug() << "Device detached";
+        // readUsbTimer.stop();
+        // device.reset();
     }
 
 private:
     void initUsbSig() {
-        connect(device.get(), &UsbDevice::readFinished, this, [&](const QByteArray &data) {
-            qDebug() << "read data: " << data.toHex(' ');
-        });
-        connect(device.get(), &UsbDevice::errorOccurred, this, [&](int errorCode, const QString &errorString) {
-            qDebug() << "usb error: " << errorString;
-        });
+        // connect(device.get(), &UsbDevice::readFinished, this, [&](const QByteArray &data) {
+        //     qDebug() << "read data: " << data.toHex(' ');
+        // });
+        // connect(device.get(), &UsbDevice::errorOccurred, this, [&](int errorCode, const QString &errorString) {
+        //     qDebug() << "usb error: " << errorString;
+        // });
     }
 
 private:
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     QTimer::singleShot(100, [&]() {
 //        UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
-        UsbDevManager::instance().addMonitorClass(0x00);
+        UsbDevManager::instance().addMonitorClass(DeviceType::USB_CLASS_MASS_STORAGE);
     });
 
     application.exec();

@@ -40,12 +40,12 @@ void UsbMonitor::removeMonitorId(UsbId id) {
     monitor->removeMonitorId(id);
 }
 
-void UsbMonitor::addMonitorClass(uint8_t devClass) {
-    monitor->addMonitorClass(devClass);
+void UsbMonitor::addMonitorClass(DeviceType deviceType) {
+    monitor->addMonitorClass(deviceType);
 }
 
-void UsbMonitor::removeMonitorClass(uint8_t devClass) {
-    monitor->removeMonitorClass(devClass);
+void UsbMonitor::removeMonitorClass(DeviceType deviceType) {
+    monitor->removeMonitorClass(deviceType);
 }
 
 QT_USB_NAMESPACE_END

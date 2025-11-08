@@ -33,7 +33,9 @@ struct ConfigurationData {
 
 struct DescriptorData {
     bool fullDuplexSupported{false};
-    DevClassType devClassType;
+    quint8 deviceClass = 0;
+    quint8 deviceSubClass = 0;
+    quint8 deviceProtocol = 0;
     QMap<quint8, ConfigurationData> configurations;
 };
 

@@ -18,16 +18,16 @@ public:
 
     void removeMonitorId(UsbId id);
 
-    void addMonitorClass(uint8_t devClass);
+    void addMonitorClass(DeviceType deviceType);
 
-    void removeMonitorClass(uint8_t devClass);
+    void removeMonitorClass(DeviceType deviceType);
 
     void start() const;
 
     void stop() const;
 
 signals:
-    void deviceAttached(UsbId id, LibUsbDevWrap device);
+    void deviceAttached(UsbId id);
     void deviceDetached(UsbId id);
 
 private:

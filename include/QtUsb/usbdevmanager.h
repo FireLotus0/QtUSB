@@ -43,13 +43,13 @@ public:
      * @brief 添加需要监听的设备类别
      * @param devClass 设备类别
      */
-    void addMonitorClass(uint8_t devClass);
+    void addMonitorClass(DeviceType deviceType);
 
     /**
      * @brief 取消对指定设备类别的监听
      * @param devClass 设备类别
      */
-    void removeMonitorClass(uint8_t devClass);
+    void removeMonitorClass(DeviceType deviceType);
 
     /**
      * @brief 通过ID获取设备指针
@@ -77,7 +77,7 @@ signals:
     void deviceDetached(UsbId id);
 
 private slots:
-    void onDeviceAttached(UsbId id, LibUsbDevWrap dev);
+    void onDeviceAttached(UsbId id);
     void onDeviceDetached(UsbId id);
 
 private:

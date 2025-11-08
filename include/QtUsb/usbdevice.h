@@ -4,6 +4,7 @@
 #include "QtUsb/datatypes.h"
 #include "QtUsb/qtusb_export.h"
 #include <qobject.h>
+#include <qflags.h>
 
 QT_USB_NAMESPACE_BEGIN
 class IoCommand;
@@ -13,7 +14,7 @@ class QTUSB_API UsbDevice : public QObject {
     Q_OBJECT
 
 public:
-    explicit UsbDevice(UsbId usbId, libusb_device *device, QObject *parent = nullptr);
+    explicit UsbDevice(UsbId usbId, QObject *parent = nullptr);
 
     ~UsbDevice();
 
@@ -49,7 +50,7 @@ public:
 
 private:
     /**
-     * @brief 打开设备。当监听到设备插入时，在UsbDevManager自动进行打开操作，若成功，会设置validFlag=true，后续IO操作可顺利进行
+     * @brief 打开设备
      * @param usbId
      * @param device
      */
@@ -63,8 +64,6 @@ signals:
 private:
     std::atomic<bool> validFlag{false};
     UsbId id;
-    libusb_device* device{nullptr};
-    UsbDescriptor* descriptor{nullptr};
     ActiveUSBConfig usbCfg;
     IoCommand *ioCommand{nullptr};
     libusb_device_handle *handle{nullptr};

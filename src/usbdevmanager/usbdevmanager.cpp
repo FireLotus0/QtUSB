@@ -3,8 +3,9 @@
 #include "QtUsb/usbdevice.h"
 #include <qloggingcategory.h>
 
-QT_USB_NAMESPACE_BEGIN
+#include "descriptor/usbdescriptor.h"
 
+QT_USB_NAMESPACE_BEGIN
 UsbDevManager::UsbDevManager(QObject *parent)
 {
     libusb_context *ctx = nullptr;
@@ -12,10 +13,9 @@ UsbDevManager::UsbDevManager(QObject *parent)
         qCCritical(usbCategory) << "libusb_init failed";
     } else {
         qRegisterMetaType<UsbId>("UsbId");
-        qRegisterMetaType<IoData>("RequestData");
-        qRegisterMetaType<LibUsbDevWrap>("LibUsbDevWrap");
+        qRegisterMetaType<ControlRequestData>("ControlRequestData");
         qRegisterMetaType<IoData>("IoData");
-        qRegisterMetaType<uint8_t>("uint8_t");
+        qRegisterMetaType<DeviceType>("DeviceType");
 
         monitor = new UsbMonitor(parent);
         connect(monitor, &UsbMonitor::deviceAttached, this, &UsbDevManager::onDeviceAttached);
@@ -53,9 +53,9 @@ QSharedPointer<UsbDevice> UsbDevManager::getDevice(UsbId id) const {
     return nullptr;
 }
 
-void UsbDevManager::onDeviceAttached(UsbId id, LibUsbDevWrap dev) {
-    Q_ASSERT(!devices.contains(id));
-    devices[id] = QSharedPointer<UsbDevice>(new UsbDevice(id, dev.device, this));
+void UsbDevManager::onDeviceAttached(UsbId id) {
+    Q_ASSERT(!devices.contains(id) && UsbDescriptor::descriptors.contains(id));
+    devices[id] = QSharedPointer<UsbDevice>(new UsbDevice(id, this));
     emit deviceAttached(id);
 }
 
@@ -82,12 +82,12 @@ void UsbDevManager::setLogLevel(UsbLogLevel level) {
     QLoggingCategory::setFilterRules(rule);
 }
 
-void UsbDevManager::addMonitorClass(uint8_t devClass) {
-    monitor->addMonitorClass(devClass);
+void UsbDevManager::addMonitorClass(DeviceType deviceType) {
+    monitor->addMonitorClass(deviceType);
 }
 
-void UsbDevManager::removeMonitorClass(uint8_t devClass) {
-    monitor->removeMonitorClass(devClass);
+void UsbDevManager::removeMonitorClass(DeviceType deviceType) {
+    monitor->removeMonitorClass(deviceType);
 }
 
 

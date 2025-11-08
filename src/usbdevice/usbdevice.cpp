@@ -5,20 +5,15 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-UsbDevice::UsbDevice(UsbId usbId, libusb_device *device, QObject *parent)
+UsbDevice::UsbDevice(UsbId usbId, QObject *parent)
     : QObject(parent)
     , id(usbId)
-    , device(device)
 {
 }
-
 
 UsbDevice::~UsbDevice() {
     if (ioCommand) {
         delete ioCommand;
-    }
-    if (descriptor) {
-        delete descriptor;
     }
     if (usbCfg.interface != 0xFF) {
         libusb_release_interface(handle, usbCfg.interface);
@@ -93,9 +88,9 @@ void UsbDevice::openDevice() {
         return;
     }
     libusb_set_auto_detach_kernel_driver(handle, 1);
-    descriptor = new UsbDescriptor(device);
-    ioCommand = new IoCommand(descriptor->getDescriptorData(), handle);
-    descriptor->printInfo();
+    const auto& descriptorData = UsbDescriptor::descriptors[id];
+    ioCommand = new IoCommand(descriptorData.getDescriptorData(), handle);
+    descriptorData.printInfo();
     connect(ioCommand, &IoCommand::readFinished, this, &UsbDevice::readFinished);
     connect(ioCommand, &IoCommand::writeFinished, this, &UsbDevice::writeFinished);
     connect(ioCommand, &IoCommand::errorOccurred, this, &UsbDevice::errorOccurred);

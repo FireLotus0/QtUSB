@@ -16,11 +16,14 @@ public:
     virtual void addMonitorId(UsbId id) = 0;
     virtual void removeMonitorId(UsbId id) = 0;
 
-    virtual void addMonitorClass(uint8_t devClass) = 0;
-    virtual void removeMonitorClass(uint8_t devClass) = 0;
+    virtual void addMonitorClass(DeviceType deviceType) = 0;
+    virtual void removeMonitorClass(DeviceType deviceType) = 0;
 
     virtual void startMonitor();
     virtual void stopMonitor();
+
+protected:
+    libusb_class_code deviceType2Code(DeviceType deviceType);
 
 public:
     QAtomicInt monitorFlag{0};

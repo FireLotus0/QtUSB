@@ -23,10 +23,6 @@ struct QTUSB_API UsbId {
     friend QDebug& operator<<(QDebug& out, const UsbId& data);
 };
 
-struct LibUsbDevWrap {
-    libusb_device* device;
-};
-
 enum class TransferType {
     CONTROL = 0,
     ISO,
@@ -97,14 +93,30 @@ struct QTUSB_API ActiveUSBConfig {
     bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
 };
 
-// 设备类别
-enum class DevClassType {
-    MASS_STORAGE,   // U盘
+enum class DeviceType {
+    UNDEFINED = 1,
+    USB_CLASS_AUDIO = 1 << 1,
+    USB_CLASS_COMM = 1 << 2,
+    USB_CLASS_HID = 1 << 3,
+    USB_CLASS_PHYSICAL = 1 << 4,
+    USB_CLASS_IMAGE = 1 << 5,
+    USB_CLASS_PRINTER = 1 << 6,
+    USB_CLASS_MASS_STORAGE = 1 << 7,
+    USB_CLASS_HUB = 1 << 8,
+    USB_CLASS_DATA = 1 << 9,
+    USB_CLASS_SMART_CARD = 1 << 10,
+    USB_CLASS_CONTENT_SECURITY = 1 << 11,
+    USB_CLASS_VIDEO = 1 << 12,
+    USB_CLASS_PERSONAL_HEALTHCARE = 1 << 13,
+    USB_CLASS_DIAGNOSTIC_DEVICE = 1 << 14,
+    USB_CLASS_WIRELESS = 1 << 15,
+    USB_CLASS_MISCELLANEOUS = 1 << 16,
+    USB_CLASS_APPLICATION = 1 << 17,
+    USB_CLASS_VENDOR_SPEC = 1 << 18,
 };
-
 
 QT_USB_NAMESPACE_END
 
 Q_DECLARE_METATYPE(QT_USB::UsbId)
-Q_DECLARE_METATYPE(QT_USB::LibUsbDevWrap)
 Q_DECLARE_METATYPE(QT_USB::IoData)
+Q_DECLARE_METATYPE(QT_USB::DeviceType)
