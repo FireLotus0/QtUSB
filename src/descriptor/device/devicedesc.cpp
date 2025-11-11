@@ -28,6 +28,10 @@ void DeviceDesc::resolveInfo() {
         content += genContentLine("USB Version: ", QString::number(desc.bcdUSB >> 8), ".", QString::number(desc.bcdUSB & 0xFF));
         content += genContentLine("Device Speed: ", (devSpeedInfo.contains(speed) ? devSpeedInfo[speed] : "Unknown Speed"));
         content += genContentLine("Possible Configurations: ", QString::number(desc.bNumConfigurations));
+        content += genContentLine("Device Class: ", QString::number(desc.bDeviceClass));
+        content += genContentLine("Device Subclass: ", QString::number(desc.bDeviceSubClass));
+        content += genContentLine("Device Protocol: ", QString::number(desc.bDeviceProtocol));
+
         if((desc.bcdUSB >> 8) >= 3) {
             descriptorData->fullDuplexSupported = true;
         }

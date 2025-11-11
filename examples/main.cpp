@@ -21,13 +21,10 @@ public:
 public slots:
     void onDeviceAttached(UsbId id) {
         qDebug() << "Device attached";
-        // device = UsbDevManager::instance().getDevice(id);
-        // if (device) {
-        //     initUsbSig();
-        //     device->setConfiguration({1, 0, 1, 8});
-        //     device->setSpeedPrintEnable(true);
-        //     readUsbTimer.start();
-        // }
+         device = UsbDevManager::instance().getDevice(id);
+         if (device) {
+             device->printInfo();
+         }
     }
 
     void onDeviceDetached(UsbId id) {

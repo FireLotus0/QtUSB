@@ -19,6 +19,10 @@ void InterfaceAlter::resolveInfo() {
     content += genContentLine("Interface Number:", QString::number(desc.bInterfaceNumber));
     content += genContentLine("Alternate Setting:", QString::number(desc.bAlternateSetting));
     content += genContentLine("EndPoint Counts:", QString::number(desc.bNumEndpoints));
+    content += genContentLine("Interface Protocol:", QString::number(desc.bInterfaceProtocol));
+    content += genContentLine("Interface Class:", QString::number(desc.bInterfaceClass));
+    content += genContentLine("Interface Subclass:", QString::number(desc.bInterfaceSubClass));
+
     InterfaceData interfaceData;
     interfaceData.interfaceNumber = desc.bInterfaceNumber;
     interfaceData.interfaceProtocol = desc.bInterfaceProtocol;

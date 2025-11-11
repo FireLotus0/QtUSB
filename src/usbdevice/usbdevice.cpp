@@ -90,7 +90,6 @@ void UsbDevice::openDevice() {
     libusb_set_auto_detach_kernel_driver(handle, 1);
     const auto& descriptorData = UsbDescriptor::descriptors[id];
     ioCommand = new IoCommand(descriptorData.getDescriptorData(), handle);
-    descriptorData.printInfo();
     connect(ioCommand, &IoCommand::readFinished, this, &UsbDevice::readFinished);
     connect(ioCommand, &IoCommand::writeFinished, this, &UsbDevice::writeFinished);
     connect(ioCommand, &IoCommand::errorOccurred, this, &UsbDevice::errorOccurred);
@@ -100,6 +99,14 @@ void UsbDevice::openDevice() {
 void UsbDevice::setSpeedPrintEnable(bool enable) {
     if(ioCommand) {
         ioCommand->setSpeedPrintEnable(enable);
+    }
+}
+
+void UsbDevice::printInfo() const {
+    if(UsbDescriptor::descriptors.contains(id)) {
+        UsbDescriptor::descriptors[id].printInfo();
+    } else {
+        qCWarning(usbCategory) << "UsbDescriptor::descriptors do not contains id: id=" << id;
     }
 }
 

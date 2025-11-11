@@ -48,6 +48,11 @@ public:
      */
     void setSpeedPrintEnable(bool enable);
 
+    /**
+     * @brief 打印USB配置信息
+     */
+    void printInfo() const;
+
 private:
     /**
      * @brief 打开设备
