@@ -37,7 +37,6 @@
 ---
 
 ## 快速开始
-***注意：Linux平台上目前没有测试***  
 如何集成库：
 
 - 如何将封装库加入你的 Qt 项目
@@ -45,6 +44,7 @@
 find_package(QtUsb REQUIRED)
 //...
 target_link_libraries (${PROJECT_NAME} PUBLIC QtUsb::QtUsb)
+// 如果链接静态库，添加：target_compile_definitions(${PROJECT_NAME} PUBLIC QTUSB_STATIC)、
 ```
 - 包含头文件
 ```c++
@@ -77,7 +77,7 @@ QtUsb/
 │   ├── usbdevice/               # 设备对象类
 │   ├── usbdevmanager/           # 设备管理，单例
 │   └── usbmonitor/              # 设备热插拔监听
-├── tests/                       # 测试代码
+├── examples/                    # 测试代码,用于本地调试
 ├── cmake/                       # CMake 模块和配置文件模板
 └── README.md                    # 项目说明文档
 ```
@@ -123,12 +123,14 @@ struct QTUSB_API ActiveUSBConfig {
 ### 3. UsbDevice
 USB设备对象，提供接口进行数据传输。
 
-| 接口            | 说明                                                                                                                 |
-|---------------|--------------------------------------------------------------------------------------------------------------------|
-| setValid     | 当设备拔除时，UsbDevManager会将设备设置为无效（考虑到用户可能会将QSharedPointer<UsbDevice>放到线程中使用，<br/>所以这是一个原子操作），IO操作会被忽略，***使用者通常不需要调用*** |
+| 接口               | 说明                                                                                                                 |
+|------------------|--------------------------------------------------------------------------------------------------------------------|
+| setValid         | 当设备拔除时，UsbDevManager会将设备设置为无效（考虑到用户可能会将QSharedPointer<UsbDevice>放到线程中使用，<br/>所以这是一个原子操作），IO操作会被忽略，***使用者通常不需要调用*** |
 | setConfiguration | 选择需要的配置，参数为   ActiveUSBConfig结构体                                                                                   |
-| read | 读取数据，当设备拔出或没有选择配置时，读取操作无效                                                                                          |
-| write | 写入数据，当设备拔出或没有选择配置时，写入操作无效   |
+| read             | 读取数据，当设备拔出或没有选择配置时，读取操作无效                                                                                          |
+| write            | 写入数据，当设备拔出或没有选择配置时，写入操作无效                                                                                          |
+| printInfo        | 打印设备配置新信息                                              |
+
 
 | 信号              | 说明     |
 |-----------------|--------|
