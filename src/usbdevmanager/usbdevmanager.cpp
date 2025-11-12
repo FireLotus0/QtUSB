@@ -60,9 +60,10 @@ void UsbDevManager::onDeviceAttached(UsbId id) {
 }
 
 void UsbDevManager::onDeviceDetached(UsbId id) {
-    Q_ASSERT(devices.contains(id));
-    devices[id]->setValid(false);
-    devices.remove(id);
+    if(devices.contains(id)) {
+        devices[id]->setValid(false);
+        devices.remove(id);
+    }
     emit deviceDetached(id);
 }
 

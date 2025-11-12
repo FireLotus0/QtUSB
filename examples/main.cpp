@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     QTimer::singleShot(100, [&]() {
 //        UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
-        UsbDevManager::instance().addMonitorClass(DeviceType::USB_CLASS_MASS_STORAGE);
+        UsbDevManager::instance().addMonitorClass(DeviceType::ANY_CLASS);
     });
 
     application.exec();

@@ -24,7 +24,7 @@ void MonitorBase::stopMonitor() {
 
 libusb_class_code MonitorBase::deviceType2Code(DeviceType deviceType) {
     switch (deviceType) {
-        case DeviceType::UNDEFINED: return LIBUSB_CLASS_PER_INTERFACE;
+        case DeviceType::UNDEFINED_CLASS: return LIBUSB_CLASS_PER_INTERFACE;
         case DeviceType::USB_CLASS_AUDIO: return LIBUSB_CLASS_AUDIO;
         case DeviceType::USB_CLASS_COMM: return LIBUSB_CLASS_COMM;
         case DeviceType::USB_CLASS_HID: return LIBUSB_CLASS_HID;

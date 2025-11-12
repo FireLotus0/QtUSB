@@ -94,7 +94,8 @@ struct QTUSB_API ActiveUSBConfig {
 };
 
 enum class DeviceType {
-    UNDEFINED = 1,
+    ANY_CLASS = 0,
+    UNDEFINED_CLASS = 1,
     USB_CLASS_AUDIO = 1 << 1,
     USB_CLASS_COMM = 1 << 2,
     USB_CLASS_HID = 1 << 3,

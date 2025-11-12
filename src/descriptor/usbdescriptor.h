@@ -37,7 +37,7 @@ private:
 
 private:
     DescriptorBase* descriptor{};
-    DeviceTypes deviceType{DeviceType::UNDEFINED};
+    DeviceTypes deviceType{DeviceType::UNDEFINED_CLASS};
     QString configInfo;
     DescriptorData descriptorData;
 };

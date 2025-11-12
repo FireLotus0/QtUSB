@@ -42,7 +42,7 @@ UsbDescriptor::DeviceTypes UsbDescriptor::getDeviceTypes() const {
 
 void UsbDescriptor::resolveDeviceType() {
     auto type = classCode2Type(static_cast<libusb_class_code>(descriptorData.deviceClass));
-    if (type == DeviceType::UNDEFINED) {
+    if (type == DeviceType::UNDEFINED_CLASS) {
         for (const auto& cfg : descriptorData.configurations) {
             for (const auto& interface : cfg.interfaces) {
                 deviceType |= classCode2Type(static_cast<libusb_class_code>(interface.interfaceClass));
@@ -56,7 +56,7 @@ DeviceType UsbDescriptor::classCode2Type(libusb_class_code code) const {
         return DeviceType::USB_CLASS_IMAGE;
     }
     switch (code) {
-        case LIBUSB_CLASS_PER_INTERFACE: return DeviceType::UNDEFINED;
+        case LIBUSB_CLASS_PER_INTERFACE: return DeviceType::UNDEFINED_CLASS;
         case LIBUSB_CLASS_AUDIO: return DeviceType::USB_CLASS_AUDIO;
         case LIBUSB_CLASS_COMM: return DeviceType::USB_CLASS_COMM;
         case LIBUSB_CLASS_HID: return DeviceType::USB_CLASS_HID;
@@ -74,7 +74,7 @@ DeviceType UsbDescriptor::classCode2Type(libusb_class_code code) const {
         case LIBUSB_CLASS_MISCELLANEOUS: return DeviceType::USB_CLASS_MISCELLANEOUS;
         case LIBUSB_CLASS_APPLICATION: return DeviceType::USB_CLASS_APPLICATION;
         case LIBUSB_CLASS_VENDOR_SPEC: return DeviceType::USB_CLASS_VENDOR_SPEC;
-        default: return DeviceType::UNDEFINED;
+        default: return DeviceType::UNDEFINED_CLASS;
     }
 }
 
