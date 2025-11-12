@@ -6,11 +6,8 @@ include_directories(${CMAKE_SOURCE_DIR}/include/)
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
-if (UNIX)
-    find_library(UDEV_LIB NAMES udev REQUIRED)
-endif ()
 
-if(MSVC)
+if (MSVC)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 endif ()
@@ -21,21 +18,10 @@ add_executable(${PROJECT_NAME}
     ${QtUsb_SOURCES}
 )
 
-if (MSVC)
-    target_link_libraries(Test
-        Qt5::Core
-        ${USB_LIB}
-    )
-else ()
-    target_link_libraries(Test
-        Qt5::Core
-        ${USB_LIB}
-        ${UDEV_LIB}
-    )
-endif ()
-
-
-
+target_link_libraries(Test
+    Qt5::Core
+    ${USB_LIB}
+)
 
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC QTUSB_STATIC)
