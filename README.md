@@ -102,18 +102,19 @@ struct QTUSB_API ActiveUSBConfig {
 
 
 ### 2. UsbDevManager
-这是一个单例类。主要是代替用户进行USB设备管理。当设备到来时，UsbDevManager会主动打开设备，无论是否打开成功，
-***都将创建QSharedPointer\<UsbDevice>实例，并进行管理，当设备拔除时，释放其智能指针。因此，即使用户获取到设备，如果打开失败，进行读写也会失败。
-当设备打开成功时，会打印设备的描述符信息：设备描述符，配置描述符，接口描述符，端点描述符，在UsbDevice::setConfiguration时，可以根据这些信息进行设置***。
+这是一个单例类。主要是代替用户进行USB设备管理。当用户从UsbDevManager获取到设备QSharedPointer<UsbDevice>，***需要检查是否为空***。
+当调用UsbDevice::setConfiguration()时，会自动打开设备。通过UsbDevice::printInfo()可以打印设备配置信息，在UsbDevice::setConfiguration时，可以根据这些信息进行设置***。
 
-| 接口            | 说明                                                          |
-|---------------|-------------------------------------------------------------|
-| addMonitorId     | 添加需要监听的设备                                                   |
-| removeMonitorId | 取消对指定设备的监听                                                  |
-| addMonitorClass     | 根据设备类别添加监听                                                  |
-| removeMonitorClass | 取消对指定类别的监听                                                  |
-| getDevice | 获取设备， 返回QSharedPointer<UsbDevice>，需要检查是否为nullptr(当设备不存在时为空) |
-| setLogLevel | 设置内部日志输出级别： DEBUG，INFO，WARNING，CRITICAL                     |
+| 接口            | 说明                                                                   |
+|---------------|----------------------------------------------------------------------|
+| addMonitorId     | 添加需要监听的设备                                                            |
+| removeMonitorId | 取消对指定设备的监听                                                           |
+| addMonitorClass     | 根据设备类别添加监听                                                           |
+| removeMonitorClass | 取消对指定类别的监听                                                           |
+| getDevice | 获取设备， 返回QSharedPointer<UsbDevice>，需要检查是否为nullptr(当设备不存在时为空)          |
+| setLogLevel | 设置内部日志输出级别： DEBUG，INFO，WARNING，CRITICAL                              |
+| releaseUsbCxt | 程序退出时会调用此函数释放libusb，***特别地，当程序异常终止（例如Ctrl C按下），用户需要监听此类事件，然后调用此函数*** |
+
 
 | 信号              | 说明                                                         |
 |-----------------|------------------------------------------------------------|

@@ -63,6 +63,12 @@ public:
      * @param level
      */
     void setLogLevel(UsbLogLevel level);
+
+    /**
+     * @brief 释放libusb
+     * @note 
+     */
+    void releaseUsbCxt();
 signals:
     /**
      * @brief 设备插入

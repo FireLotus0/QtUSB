@@ -2,6 +2,7 @@
 #include "usbmonitor/usbmonitor.h"
 #include "QtUsb/usbdevice.h"
 #include <qloggingcategory.h>
+#include <QCoreApplication>
 
 #include "descriptor/usbdescriptor.h"
 
@@ -25,12 +26,9 @@ UsbDevManager::UsbDevManager(QObject *parent)
 }
 
 UsbDevManager::~UsbDevManager() {
-    for (auto device : devices) {
-        device->setValid(false);
-    }
-    devices.clear();
-    delete monitor;
-    libusb_exit(nullptr);
+   if(monitor !=  nullptr) {
+       releaseUsbCxt();
+   }
 }
 
 UsbDevManager & UsbDevManager::instance() {
@@ -89,6 +87,19 @@ void UsbDevManager::addMonitorClass(DeviceType deviceType) {
 
 void UsbDevManager::removeMonitorClass(DeviceType deviceType) {
     monitor->removeMonitorClass(deviceType);
+}
+
+void UsbDevManager::releaseUsbCxt() {
+    for (auto device : devices) {
+        device->setValid(false);
+    }
+    qCDebug(usbCategory) << "UsbDevManager released!";
+    devices.clear();
+    if(monitor) {
+        delete monitor;
+        monitor = nullptr;
+        libusb_exit(nullptr);
+    }
 }
 
 

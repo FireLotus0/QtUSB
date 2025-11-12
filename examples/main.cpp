@@ -61,7 +61,9 @@ int main(int argc, char *argv[]) {
 //        UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
         UsbDevManager::instance().addMonitorClass(DeviceType::ANY_CLASS);
     });
-
+    QObject::connect(&application, &QCoreApplication::aboutToQuit, [&]() {
+        UsbDevManager::instance().deleteLater();
+    });
     application.exec();
 }
 
