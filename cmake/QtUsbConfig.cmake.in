@@ -2,8 +2,11 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(Qt5Core REQUIRED)
-
+# 先找 Qt6，再找 Qt5
+find_dependency(Qt6Core QUIET)
+if(NOT Qt6Core_FOUND)
+    find_dependency(Qt5Core REQUIRED)
+endif()
 set(QtUsb_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 
 include("${CMAKE_CURRENT_LIST_DIR}/QtUsbTargets.cmake")

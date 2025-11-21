@@ -66,7 +66,16 @@ if(MSVC)
     set(MSVC_UTF8_FLAGS "/utf-8")
 endif()
 
-find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt6 COMPONENTS Core QUIET)
+if(Qt6_FOUND)
+    set(QT_CORE_LIB Qt6::Core)
+    message(STATUS "Using Qt6")
+elseif(NOT Qt6_FOUND)
+    find_package(Qt5 COMPONENTS Core REQUIRED)
+    message(STATUS "Using Qt5")
+    set(QT_CORE_LIB Qt5::Core)
+endif()
+
 find_library(USB_LIB NAMES libusb-1.0 usb-1.0 usb)
 if(NOT USB_LIB)
     message(FATAL_ERROR "Cannot find libusb")
@@ -83,7 +92,7 @@ target_include_directories(QtUsb
 
 target_link_libraries(QtUsb
     PUBLIC
-    Qt5::Core
+    ${QT_CORE_LIB}
     ${USB_LIB}
 )
 

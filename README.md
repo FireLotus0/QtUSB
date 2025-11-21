@@ -30,7 +30,7 @@
 
 ## 环境要求
 
-- Qt5
+- Qt5, Qt6
 - libusb 版本（libusb 1.0）
 - 支持的操作系统（Windows, Linux）
 
