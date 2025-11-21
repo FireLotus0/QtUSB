@@ -15,9 +15,11 @@ void SyncBulkTransfer::transfer(const IoData &request) {
         result.data.clear();
         int dataSize = request.data.size();
         int totalTransferred = 0;
+        int expectWrite = 0;
         while(transferred < dataSize) {
+            expectWrite = dataSize - totalTransferred > request.maxPacketSize ?  request.maxPacketSize : dataSize - totalTransferred;
             result.resultCode = libusb_bulk_transfer(request.handle, request.address,
-                                           (unsigned char*)request.data.data() + totalTransferred, dataSize - totalTransferred, &transferred, timeout);
+                                           (unsigned char*)request.data.data() + totalTransferred, expectWrite, &transferred, timeout);
             if(result.resultCode  != LIBUSB_SUCCESS) {
                 emit transferFinished(result);
                 return;
@@ -28,9 +30,7 @@ void SyncBulkTransfer::transfer(const IoData &request) {
             }
         }
     } else {
-        if(readCache.size() != readCacheSize.loadRelaxed()) {
-            readCache.resize(readCacheSize.loadRelaxed());
-        }
+        adjustReadCacheSz(request.maxPacketSize);
         readCache.fill(0);
         result.resultCode = libusb_bulk_transfer(request.handle,  request.address, (unsigned char*)readCache.data(), readCacheSize, &transferred, timeout);
         if(result.resultCode == LIBUSB_SUCCESS) {

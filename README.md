@@ -88,7 +88,8 @@ QtUsb/
 ### 1. struct ActiveUSBConfig
 描述了设备使用的配置信息：配置，接口，端点。由于传输方式(控制，中断，批量)是由端点描述符决定的，所以当用户获取到UsbDevice时，***必须调用setConfiguration
 进行设置，这样用户只管使用read,write即可，不用关心具体使用哪种传输方式***，库内部根据ActiveUSBConfig自动选择传输方式。对于***readCacheSize***，在
-以往的开发中，***读取大量数据时，读取缓冲区大小对传输速度具有重要的影响***，因此提供该参数由用户自己进行设置。而***queuedCommands***，则是为了方便实现一些应用层面上的处理
+以往的开发中，***读取大量数据时，读取缓冲区大小对传输速度具有重要的影响***，因此提供该参数由用户自己进行设置，如果readCacheSize < 端点的maxPacketSize, readCacheSize自动调整为maxPacketSize，亦或readCacheSize > maxPacketSize  && (readCacheSize % maxPacketSize) != 0,
+readCacheSize将自动向上取整到maxPacketSize的整数倍。而***queuedCommands***，则是为了方便实现一些应用层面上的处理
 逻辑，例如自定义通信协议时：请求1-->响应1, 请求2-->响应2......
 ```c++
 struct QTUSB_API ActiveUSBConfig {

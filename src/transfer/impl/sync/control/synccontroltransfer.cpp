@@ -8,7 +8,6 @@ SyncControlTransfer::SyncControlTransfer(QObject *parent)
 }
 
 void SyncControlTransfer::transfer(const IoData &request) {
-    int transferred = 0;
     auto result = request;
     result.resultCode = libusb_control_transfer(request.handle, request.controlRequestData.requestType, request.controlRequestData.request,
                                                 request.controlRequestData.value, request.controlRequestData.index, (unsigned char*)request.data.data(),

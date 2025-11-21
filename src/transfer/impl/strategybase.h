@@ -18,6 +18,10 @@ signals:
     void transferFinished(const IoData& rsponse);
 
 protected:
+    // 自动调整读取缓冲区大小为最大包大小的整数倍
+    void adjustReadCacheSz(int maxPacketSize);
+
+protected:
     QAtomicInt readCacheSize = 1024;
     int timeout = 2000;
     int transferInterval = 0;
