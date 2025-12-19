@@ -53,8 +53,8 @@ private:
 
 private:
     DescriptorData descriptorData;
-    ConfigurationData* curCfg;
-    InterfaceData* curInterface;
+    ConfigurationData* curCfg{nullptr};
+    InterfaceData* curInterface{nullptr};
 
     ActiveUSBConfig config;
     IoContext ioContext;

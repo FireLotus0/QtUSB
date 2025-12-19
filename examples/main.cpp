@@ -24,7 +24,7 @@ public slots:
         device->printInfo();
         ActiveUSBConfig config;
         config.interface = 0;
-        config.configuration = 1;
+        config.configuration = 0;
         config.pointNumber = 1;
         config.readCacheSize = 1024 * 60;
         device->setConfiguration(config);

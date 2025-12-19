@@ -80,13 +80,24 @@ void IoCommand::makeIoData(TransferDirection direction, QByteArray &&data) {
 }
 
 void IoCommand::read() {
-    assert(curInterface);
+    if(!curCfg || !curInterface) {
+        qCWarning(usbCategory) << "Read Failed: Invalid Active Usb Configuration: configuration valid = "
+            << (curCfg != nullptr) << " interface valid = " << (curInterface != nullptr);
+        return;
+    }
     makeIoData(TransferDirection::DEVICE_TO_HOST, {});
     doTransfer(true);
 }
 
 void IoCommand::write(QByteArray &&data) {
-    assert(curInterface);
+    if(!curCfg || !curInterface) {
+        if(!curCfg || !curInterface) {
+            qCWarning(usbCategory) << "Read Failed: Invalid Active Usb Configuration: configuration valid = "
+                                   << (curCfg != nullptr) << " interface valid = " << (curInterface != nullptr);
+            return;
+        }
+        return;
+    }
     makeIoData(TransferDirection::HOST_TO_DEVICE, std::move(data));
     doTransfer(false);
 }

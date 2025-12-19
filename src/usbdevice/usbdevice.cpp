@@ -40,7 +40,7 @@ void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
     if (usbCfg.interface != 0xFF) {
         libusb_release_interface(handle, usbCfg.interface);
     }
-    libusb_set_configuration(handle, usbCfg.interface);
+    libusb_set_configuration(handle, usbCfg.configuration);
     auto  rt = libusb_claim_interface(handle, newCfg.interface);
     if(rt != 0) {
         qCWarning(usbCategory) << "UsbDevice::setConfiguration: claim interface failed, rt=" << rt << " " << libusb_error_name(rt);
