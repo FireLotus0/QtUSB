@@ -25,7 +25,7 @@ void ConfigDesc::resolveInfo() {
     if(rc != LIBUSB_SUCCESS) {
         qCWarning(usbCategory) << "Get config descriptor failed: config index:" << configIndex;
     } else {
-        content += genContentLine("Configuration #", QString::number(configIndex), " ID=", QString::number(desc->bConfigurationValue));
+        content += genContentLine("Configuration #", QString::number(configIndex), " ID=", QString::number(desc->bConfigurationValue), " [ID is used when setConfiguration]");
         content += genContentLine("Interface Counts: ", QString::number(desc->bNumInterfaces));
         ConfigurationData configurationData;
         configurationData.configurationValue = desc->bConfigurationValue;

@@ -16,7 +16,7 @@ void InterfaceAlter::resolveInfo() {
     if(!children.isEmpty()) {
         return;
     }
-    content += genContentLine("Interface Number:", QString::number(desc.bInterfaceNumber));
+    content += genContentLine("Interface Number:", QString::number(desc.bInterfaceNumber), " [Interface Number is used when setConfiguration]");
     content += genContentLine("Alternate Setting:", QString::number(desc.bAlternateSetting));
     content += genContentLine("EndPoint Counts:", QString::number(desc.bNumEndpoints));
     content += genContentLine("Interface Protocol:", QString::number(desc.bInterfaceProtocol));

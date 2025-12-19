@@ -18,7 +18,7 @@ void EndPointDesc::resolveInfo() {
     auto transferType = parseTransferType(desc.bmAttributes & 3);
     content += genContentLine(QString(24, '#'));;
     content += genContentLine("Point Address:", QString::number(desc.bEndpointAddress));
-    content += genContentLine("Point Number:", QString::number(desc.bEndpointAddress & 0xF));
+    content += genContentLine("Point Number:", QString::number(desc.bEndpointAddress & 0xF), " [Point Number is used when setConfiguration]");
     content += genContentLine("Transfer Direction:", (desc.bEndpointAddress  & 0x80) == 0 ? "Host -> Dev" : "Host <- Dev");
     content += genContentLine("Transfer Type:", transferTypeToString(transferType));
     content += genContentLine("Max Packet Size:", QString::number(desc.wMaxPacketSize));
