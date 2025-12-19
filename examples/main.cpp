@@ -12,7 +12,7 @@ class UsbUser : public QObject {
 
 public:
     explicit UsbUser(QObject *parent = 0) : QObject(parent) {
-        readUsbTimer.setInterval(100);
+        readUsbTimer.setInterval(1);
         readUsbTimer.callOnTimeout([&] {
             device->read();
         });
@@ -20,11 +20,18 @@ public:
 
 public slots:
     void onDeviceAttached(UsbId id) {
-        qDebug() << "Device attached";
-         device = UsbDevManager::instance().getDevice(id);
-         if (device) {
-             device->printInfo();
-         }
+        device = UsbDevManager::instance().getDevice(id);
+        device->printInfo();
+        ActiveUSBConfig config;
+        config.interface = 0;
+        config.configuration = 1;
+        config.pointNumber = 1;
+        config.readCacheSize = 1024 * 60;
+        device->setConfiguration(config);
+
+        // 开启速度打印
+        device->setSpeedPrintEnable(true);
+        readUsbTimer.start();
     }
 
     void onDeviceDetached(UsbId id) {
@@ -35,12 +42,12 @@ public slots:
 
 private:
     void initUsbSig() {
-        // connect(device.get(), &UsbDevice::readFinished, this, [&](const QByteArray &data) {
-        //     qDebug() << "read data: " << data.toHex(' ');
-        // });
-        // connect(device.get(), &UsbDevice::errorOccurred, this, [&](int errorCode, const QString &errorString) {
-        //     qDebug() << "usb error: " << errorString;
-        // });
+//         connect(device.get(), &UsbDevice::readFinished, this, [&](const QByteArray &data) {
+//             qDebug() << "read data: " << data.toHex(' ');
+//         });
+//         connect(device.get(), &UsbDevice::errorOccurred, this, [&](int errorCode, const QString &errorString) {
+//             qDebug() << "usb error: " << errorString;
+//         });
     }
 
 private:
@@ -58,8 +65,9 @@ int main(int argc, char *argv[]) {
     QObject::connect(&UsbDevManager::instance(), &UsbDevManager::deviceDetached, &user, &UsbUser::onDeviceDetached);
 
     QTimer::singleShot(100, [&]() {
-//        UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
-        UsbDevManager::instance().addMonitorClass(DeviceType::ANY_CLASS);
+        UsbDevManager::instance().addMonitorId({0x010c, 0x0d7d});
+        UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
+//        UsbDevManager::instance().addMonitorClass(DeviceType::ANY_CLASS);
     });
     QObject::connect(&application, &QCoreApplication::aboutToQuit, [&]() {
         UsbDevManager::instance().deleteLater();

@@ -30,6 +30,8 @@ void TransferContext::transfer(const IoData &data) {
 void TransferContext::setReadCacheSize(int size) {
     if(transferStrategies.contains(curTransStrategy)) {
         transferStrategies[curTransStrategy]->setReadCacheSize(size);
+    } else {
+        worker->setReadCacheSize(size);
     }
 }
 
@@ -65,6 +67,7 @@ void TransferWorker::makeStrategy(TransferStrategy strategy) {
     }
     context->transferStrategies[strategy] = transStrategy;
     connect(transStrategy, &StrategyBase::transferFinished, context, &TransferContext::transferFinished);
+    transStrategy->setReadCacheSize(readCacheSize);
 }
 
 void TransferWorker::quit() {
@@ -74,6 +77,10 @@ void TransferWorker::quit() {
 
 TransferWorker::~TransferWorker() {
     qCDebug(usbCategory) << "transfer worker release!";
+}
+
+void TransferWorker::setReadCacheSize(int size) {
+    readCacheSize = size;
 }
 
 QT_USB_NAMESPACE_END

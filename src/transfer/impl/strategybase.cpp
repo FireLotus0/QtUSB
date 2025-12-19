@@ -7,7 +7,10 @@ StrategyBase::StrategyBase(QObject *parent)
 }
 
 void StrategyBase::setReadCacheSize(int size) {
-    readCacheSize.storeRelease(size);
+    if(size != readCacheSize.loadRelaxed()) {
+        readCacheSize.storeRelease(size);
+        readCache.resize(size);
+    }
 }
 
 void StrategyBase::adjustReadCacheSz(int maxPacketSize) {

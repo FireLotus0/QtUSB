@@ -41,18 +41,20 @@ public:
 
     void quit();
 
+    void setReadCacheSize(int size);
 signals:
     void transfer(const IoData& data);
 
 private slots:
     void executeTransfer(const IoData& data);
 
-private:
+public:
     void makeStrategy(TransferStrategy strategy);
 
 private:
     TransferContext *context;
     QThread *thr;
+    int readCacheSize = 0ULL;
 };
 
 QT_USB_NAMESPACE_END
