@@ -27,6 +27,7 @@ public slots:
         config.configuration = 1;
         config.pointNumber = 1;
         config.readCacheSize = 1024 * 60;
+        config.queuedCommands = false;
         device->setConfiguration(config);
 
         device->write(QByteArray::fromHex("fefe03001500c07194feff"));

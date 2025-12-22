@@ -90,14 +90,16 @@ QtUsb/
 进行设置，这样用户只管使用read,write即可，不用关心具体使用哪种传输方式***，库内部根据ActiveUSBConfig自动选择传输方式。对于***readCacheSize***，在
 以往的开发中，***读取大量数据时，读取缓冲区大小对传输速度具有重要的影响***，因此提供该参数由用户自己进行设置，如果readCacheSize < 端点的maxPacketSize, readCacheSize自动调整为maxPacketSize，亦或readCacheSize > maxPacketSize  && (readCacheSize % maxPacketSize) != 0,
 readCacheSize将自动向上取整到maxPacketSize的整数倍。而***queuedCommands***，则是为了方便实现一些应用层面上的处理
-逻辑，例如自定义通信协议时：请求1-->响应1, 请求2-->响应2......
+逻辑，例如自定义通信协议时：请求1-->响应1, 请求2-->响应2......, ***特别注意：需要兼顾数据采集和指令控制时，确保queuedCommands=false，这样写命令的优先级高于读命令，保证控制指令的及时性***
 ```c++
 struct QTUSB_API ActiveUSBConfig {
     quint8 configuration = 0xFF;    // 使用的配置ID
     quint8 interface = 0xFF;        // 接口
     uint8_t pointNumber = 0xFF;     // 端点
     int readCacheSize = 1024;       // 读取缓冲区大小
-    bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
+    // queuedCommands设置为true时，会对命令进行排队，如果应用中需要读取大量数据，写命令会由于排队而导致延迟执行，此时应当queuedCommands设置为false
+    // 当queuedCommands设置为false时，不论半双工还是全双工，写命令都将优先于读命令，保证控制的及时性
+    bool queuedCommands{false};     
 };
 ```
 
@@ -167,6 +169,7 @@ public slots:
     void onDeviceAttached(UsbId id) {
         device = UsbDevManager::instance().getDevice(id);
         if (device) {
+            device->printInfo();
             device->setSpeedPrintEnable(true);
             initUsbSig();
             device->setConfiguration({1, 0, 1, 8});
