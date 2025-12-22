@@ -28,6 +28,7 @@ void SyncInterTransfer::transfer(const IoData &request) {
                 QThread::msleep(transferInterval);
             }
         }
+        emit transferFinished(result);
     } else {
         adjustReadCacheSz(request.maxPacketSize);
         readCache.fill(0);

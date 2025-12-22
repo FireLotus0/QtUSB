@@ -12,7 +12,7 @@ class UsbUser : public QObject {
 
 public:
     explicit UsbUser(QObject *parent = 0) : QObject(parent) {
-        readUsbTimer.setInterval(1);
+        readUsbTimer.setInterval(100);
         readUsbTimer.callOnTimeout([&] {
             device->read();
         });
@@ -29,15 +29,18 @@ public slots:
         config.readCacheSize = 1024 * 60;
         device->setConfiguration(config);
 
+        device->write(QByteArray::fromHex("fefe03001500c07194feff"));
         // 开启速度打印
         device->setSpeedPrintEnable(true);
-        readUsbTimer.start();
+//        QTimer::singleShot(100, [&] {
+            readUsbTimer.start();
+//        });
     }
 
     void onDeviceDetached(UsbId id) {
         qDebug() << "Device detached";
-        // readUsbTimer.stop();
-        // device.reset();
+         readUsbTimer.stop();
+         device.reset();
     }
 
 private:

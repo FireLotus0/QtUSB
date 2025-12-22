@@ -3,6 +3,8 @@
 
 QT_USB_NAMESPACE_BEGIN
 
+const QLoggingCategory &usbCategory();
+
 SyncBulkTransfer::SyncBulkTransfer(QObject *parent)
         : StrategyBase(parent)
 {
@@ -29,12 +31,15 @@ void SyncBulkTransfer::transfer(const IoData &request) {
                 QThread::msleep(transferInterval);
             }
         }
+        emit transferFinished(result);
     } else {
         adjustReadCacheSz(request.maxPacketSize);
         readCache.fill(0);
         result.resultCode = libusb_bulk_transfer(request.handle,  request.address, (unsigned char*)readCache.data(), readCacheSize, &transferred, timeout);
         if(result.resultCode == LIBUSB_SUCCESS) {
             result.data = QByteArray::fromRawData(readCache.data(), transferred);
+        } else {
+            qCritical(usbCategory()) << "Sync Bulk Transfer Error: " << libusb_error_name(result.resultCode);
         }
         emit transferFinished(result);
     }
