@@ -1,4 +1,7 @@
-#include "QtUsb/datatypes.h"
+#include "../include/QtUsb/usb_namespace.h"
+#include "../include/QtUsb/usbdevmanager.h"
+#include "../include/QtUsb/usbdevice.h"
+#include "../../include/QtUsb/datatypes.h"
 #include <qloggingcategory.h>
 
 QT_USB_NAMESPACE_BEGIN

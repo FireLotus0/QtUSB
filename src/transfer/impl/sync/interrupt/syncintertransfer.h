@@ -10,8 +10,6 @@ public:
 
     void transfer(const IoData &request) override;
 
-private:
-    uint8_t discardBytes = 0;
 };
 
 QT_USB_NAMESPACE_END

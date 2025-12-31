@@ -18,7 +18,7 @@ void SyncBulkTransfer::transfer(const IoData &request) {
         int dataSize = request.data.size();
         int totalTransferred = 0;
         int expectWrite = 0;
-        while(transferred < dataSize) {
+        while(totalTransferred < dataSize) {
             expectWrite = dataSize - totalTransferred > request.maxPacketSize ?  request.maxPacketSize : dataSize - totalTransferred;
             result.resultCode = libusb_bulk_transfer(request.handle, request.address,
                                            (unsigned char*)request.data.data() + totalTransferred, expectWrite, &transferred, timeout);

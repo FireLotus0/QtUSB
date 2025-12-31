@@ -157,3 +157,5 @@ install(FILES
 if (BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
+
+add_subdirectory(loclal_test)
