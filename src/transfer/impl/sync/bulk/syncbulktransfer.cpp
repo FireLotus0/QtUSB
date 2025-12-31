@@ -6,7 +6,7 @@ QT_USB_NAMESPACE_BEGIN
 const QLoggingCategory &usbCategory();
 
 SyncBulkTransfer::SyncBulkTransfer(QObject *parent)
-        : StrategyBase(parent)
+        : StrategyBase(0, parent)
 {
 }
 

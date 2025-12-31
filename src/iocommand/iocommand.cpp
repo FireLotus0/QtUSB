@@ -34,11 +34,11 @@ QT_USB_NAMESPACE_BEGIN
         releaseContext();
         // 半双工并且需要对命令进行排队处理，否则即使是半双工模式，写命令的优先级高于读命令
         if (!descriptorData.fullDuplexSupported && config.queuedCommands) {
-            ioContext.transferContext = new TransferContext;
+            ioContext.transferContext = new TransferContext(config.discardBytes);
             connect(ioContext.transferContext, &TransferContext::transferFinished, this,
                     &IoCommand::onTransferFinished);
         } else {
-            ioContext.readContext = new TransferContext;
+            ioContext.readContext = new TransferContext(config.discardBytes);
             connect(ioContext.readContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
 
             if (!descriptorData.fullDuplexSupported) {
@@ -46,7 +46,7 @@ QT_USB_NAMESPACE_BEGIN
                 ioContext.writeContext = ioContext.readContext;
             } else {
                 // 全双工模式
-                ioContext.writeContext = new TransferContext;
+                ioContext.writeContext = new TransferContext(config.discardBytes);
                 connect(ioContext.writeContext, &TransferContext::transferFinished, this,
                         &IoCommand::onTransferFinished);
             }

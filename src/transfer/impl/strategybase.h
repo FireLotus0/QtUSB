@@ -8,7 +8,7 @@ QT_USB_NAMESPACE_BEGIN
 class StrategyBase : public QObject {
 Q_OBJECT
 public:
-    explicit StrategyBase(QObject *parent = nullptr);
+    explicit StrategyBase(uint8_t discardBytes, QObject *parent = nullptr);
 
     virtual void transfer(const IoData &request) = 0;
 
@@ -26,6 +26,7 @@ protected:
     int timeout = 2000;
     int transferInterval = 0;
     QByteArray readCache;
+    uint8_t discardBytes; // 用于在Windows平台上使用单片机进行中断传输时，分包处理时使用
 };
 
 QT_USB_NAMESPACE_END

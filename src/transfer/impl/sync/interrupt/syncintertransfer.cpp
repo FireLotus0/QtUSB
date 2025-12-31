@@ -3,8 +3,8 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-SyncInterTransfer::SyncInterTransfer(QObject *parent)
-        : StrategyBase(parent)
+SyncInterTransfer::SyncInterTransfer(uint8_t discardBytes, QObject *parent)
+        : StrategyBase(discardBytes, parent)
 {
 }
 

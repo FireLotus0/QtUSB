@@ -12,7 +12,7 @@ class TransferWorker;
 class TransferContext : public QObject {
 Q_OBJECT
 public:
-    explicit TransferContext(QObject *parent = nullptr);
+    explicit TransferContext(uint8_t discardBytes, QObject *parent = nullptr);
 
     ~TransferContext();
 
@@ -26,16 +26,15 @@ signals:
 private:
     TransferStrategy curTransStrategy{};
     QMap<TransferStrategy, StrategyBase *> transferStrategies;
-
     friend class TransferWorker;
-
     TransferWorker *worker;
+    uint8_t discardBytes = 0;   // 用于在Windows平台上使用单片机进行中断传输时，分包处理时使用
 };
 
 class TransferWorker : public QObject {
 Q_OBJECT
 public:
-    TransferWorker(TransferContext *context, QObject *parent = nullptr);
+    TransferWorker(TransferContext *context, uint8_t discardBytes, QObject *parent = nullptr);
 
     ~TransferWorker();
 
@@ -55,6 +54,7 @@ private:
     TransferContext *context;
     QThread *thr;
     int readCacheSize = 0ULL;
+    uint8_t discardBytes;
 };
 
 QT_USB_NAMESPACE_END

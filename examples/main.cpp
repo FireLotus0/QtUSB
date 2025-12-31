@@ -30,7 +30,7 @@ public slots:
         config.queuedCommands = false;
         device->setConfiguration(config);
 
-        device->write(QByteArray::fromHex("fefe03001500c07194feff"));
+//        device->write(QByteArray::fromHex("fefe03001500c07194feff"));
         // 开启速度打印
         device->setSpeedPrintEnable(true);
 //        QTimer::singleShot(100, [&] {
