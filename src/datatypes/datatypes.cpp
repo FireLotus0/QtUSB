@@ -48,6 +48,7 @@ TransferStrategy transTypeToStrategy(bool sync, TransferType type) {
     } else {
         assert(false);
     }
+    return TransferStrategy::SYNC_BULK;
 }
 
 IoData::IoData(QT_USB::IoData &&other) noexcept {
