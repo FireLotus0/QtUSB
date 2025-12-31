@@ -23,7 +23,7 @@ void SyncInterTransfer::transfer(const IoData &request) {
                 emit transferFinished(result);
                 return;
             }
-            totalTransferred += transferred;
+            totalTransferred += (transferred - discardBytes);
             if(transferInterval > 0) {
                 QThread::msleep(transferInterval);
             }
