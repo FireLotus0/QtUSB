@@ -9,11 +9,10 @@ QT_USB_NAMESPACE_BEGIN
 
 const QLoggingCategory &usbCategory();
 
-TransferContext::TransferContext(uint8_t discardBytes, QObject *parent)
+TransferContext::TransferContext(uint8_t discardBytes,  uint8_t cmdInterval, QObject *parent)
         : QObject(parent)
-        , discardBytes(discardBytes)
 {
-    worker = new TransferWorker(this, discardBytes);
+    worker = new TransferWorker(this, discardBytes, cmdInterval);
 }
 
 TransferContext::~TransferContext() {
@@ -36,10 +35,11 @@ void TransferContext::setReadCacheSize(int size) {
     }
 }
 
-TransferWorker::TransferWorker(TransferContext* context, uint8_t discardBytes, QObject *parent)
+TransferWorker::TransferWorker(TransferContext* context, uint8_t discardBytes, uint8_t cmdInterval, QObject *parent)
     : QObject(parent)
     , context(context)
     , discardBytes(discardBytes)
+    , cmdInterval(cmdInterval)
 {
     thr = new QThread;
     connect(this, &TransferWorker::transfer, this, &TransferWorker::executeTransfer);
@@ -59,9 +59,9 @@ void TransferWorker::executeTransfer(const IoData &data) {
 void TransferWorker::makeStrategy(TransferStrategy strategy) {
     StrategyBase* transStrategy;
     switch (strategy) {
-        case TransferStrategy::SYNC_BULK: transStrategy = new SyncBulkTransfer; break;
+        case TransferStrategy::SYNC_BULK: transStrategy = new SyncBulkTransfer(cmdInterval); break;
         case TransferStrategy::SYNC_CONTROL: transStrategy = new SyncControlTransfer; break;
-        case TransferStrategy::SYNC_INTERRUPT: transStrategy = new SyncInterTransfer(discardBytes); break;
+        case TransferStrategy::SYNC_INTERRUPT: transStrategy = new SyncInterTransfer(discardBytes, cmdInterval); break;
         case TransferStrategy::ASYNC_BULK: assert(false);
         case TransferStrategy::ASYNC_ISO: assert(false);
         case TransferStrategy::ASYNC_CONTROL: assert(false);

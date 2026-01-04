@@ -3,8 +3,8 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-    SyncInterTransfer::SyncInterTransfer(uint8_t discardBytes, QObject *parent)
-            : StrategyBase(discardBytes, parent) {
+    SyncInterTransfer::SyncInterTransfer(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent)
+            : StrategyBase(discardBytes, cmdInterval, parent) {
     }
 
     void SyncInterTransfer::transfer(const IoData &request) {
@@ -34,21 +34,33 @@ QT_USB_NAMESPACE_BEGIN
                     return;
                 }
                 totalTransferred += (transferred - discardBytes);
-                if (transferInterval > 0) {
-                    QThread::msleep(transferInterval);
+                if (cmdInterval > 0) {
+                    QThread::msleep(cmdInterval);
                 }
             }
             emit transferFinished(result);
         } else {
-            adjustReadCacheSz(request.maxPacketSize);
-            readCache.fill(0);
-            result.resultCode = libusb_interrupt_transfer(request.handle, request.address,
-                                                          (unsigned char *) readCache.data(), readCacheSize,
-                                                          &transferred, timeout);
-            if (result.resultCode == LIBUSB_SUCCESS) {
-                result.data = QByteArray::fromRawData(readCache.data(), transferred);
+            if(discardBytes > 0) {
+                readCache.resize(request.maxPacketSize + discardBytes);
+                readCache.fill(0);
+                result.resultCode = libusb_interrupt_transfer(request.handle, request.address,
+                                                              (unsigned char *) readCache.data(), readCacheSize,
+                                                              &transferred, timeout);
+                if (result.resultCode == LIBUSB_SUCCESS) {
+                    result.data = QByteArray::fromRawData(readCache.data(), transferred - discardBytes);
+                }
+                emit transferFinished(result);
+            } else {
+                adjustReadCacheSz(request.maxPacketSize);
+                readCache.fill(0);
+                result.resultCode = libusb_interrupt_transfer(request.handle, request.address,
+                                                              (unsigned char *) readCache.data(), readCacheSize,
+                                                              &transferred, timeout);
+                if (result.resultCode == LIBUSB_SUCCESS) {
+                    result.data = QByteArray::fromRawData(readCache.data(), transferred);
+                }
+                emit transferFinished(result);
             }
-            emit transferFinished(result);
         }
     }
 

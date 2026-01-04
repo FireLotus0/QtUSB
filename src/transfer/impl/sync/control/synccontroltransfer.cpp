@@ -4,7 +4,7 @@
 QT_USB_NAMESPACE_BEGIN
 
 SyncControlTransfer::SyncControlTransfer(QObject *parent)
-        : StrategyBase(0, parent) {
+        : StrategyBase(0, 0, parent) {
 }
 
 void SyncControlTransfer::transfer(const IoData &request) {

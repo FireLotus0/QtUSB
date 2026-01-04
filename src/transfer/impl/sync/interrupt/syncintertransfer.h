@@ -6,7 +6,7 @@ QT_USB_NAMESPACE_BEGIN
 
 class SyncInterTransfer : public StrategyBase {
 public:
-    explicit SyncInterTransfer(uint8_t discardBytes, QObject *parent = nullptr);
+    explicit SyncInterTransfer(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent = nullptr);
 
     void transfer(const IoData &request) override;
 

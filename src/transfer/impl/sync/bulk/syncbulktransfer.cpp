@@ -5,8 +5,8 @@ QT_USB_NAMESPACE_BEGIN
 
 const QLoggingCategory &usbCategory();
 
-SyncBulkTransfer::SyncBulkTransfer(QObject *parent)
-        : StrategyBase(0, parent)
+SyncBulkTransfer::SyncBulkTransfer(uint8_t cmdInterval, QObject *parent)
+        : StrategyBase(0, cmdInterval, parent)
 {
 }
 
@@ -27,8 +27,8 @@ void SyncBulkTransfer::transfer(const IoData &request) {
                 return;
             }
             totalTransferred += transferred;
-            if(transferInterval > 0) {
-                QThread::msleep(transferInterval);
+            if(cmdInterval > 0) {
+                QThread::msleep(cmdInterval);
             }
         }
         emit transferFinished(result);

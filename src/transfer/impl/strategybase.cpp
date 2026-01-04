@@ -2,14 +2,15 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-StrategyBase::StrategyBase(uint8_t discardBytes, QObject *parent)
+StrategyBase::StrategyBase(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent)
         : QObject(parent)
         , discardBytes(discardBytes)
+        , cmdInterval(cmdInterval)
 {
 }
 
 void StrategyBase::setReadCacheSize(int size) {
-    if(size != readCacheSize.loadRelaxed()) {
+    if(size != readCache.size()) {
         readCacheSize.storeRelease(size);
         readCache.resize(size);
     }

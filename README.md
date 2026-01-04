@@ -93,13 +93,26 @@ readCacheSize将自动向上取整到maxPacketSize的整数倍。而***queuedCom
 逻辑，例如自定义通信协议时：请求1-->响应1, 请求2-->响应2......, ***特别注意：需要兼顾数据采集和指令控制时，确保queuedCommands=false，这样写命令的优先级高于读命令，保证控制指令的及时性***
 ```c++
 struct QTUSB_API ActiveUSBConfig {
-    quint8 configuration = 0xFF;    // 使用的配置ID
-    quint8 interface = 0xFF;        // 接口
+    uint8_t configuration = 0xFF;   // 使用的配置ID
+    uint8_t interface = 0xFF;       // 接口
     uint8_t pointNumber = 0xFF;     // 端点
     int readCacheSize = 1024;       // 读取缓冲区大小
-    // queuedCommands设置为true时，会对命令进行排队，如果应用中需要读取大量数据，写命令会由于排队而导致延迟执行，此时应当queuedCommands设置为false
-    // 当queuedCommands设置为false时，不论半双工还是全双工，写命令都将优先于读命令，保证控制的及时性
-    bool queuedCommands{false};     
+    bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
+    /*
+     * 在使用单片机USB实现中断传输时，在Windows平台上，libusb返回实际传输（读/写）的
+     * 字节数时会多出1字节, Linux平台上正常。抓包分析，发送的数据确实多出一个字节，值为0。
+     * 例如：写入64字节数据，但是Windows平台上写入了65字节数据，即使设备最大包大小仅为64字节，此时设置discardBytes=1，
+     * 每次分包写入时减去discardBytes，从而避免分包错误。当读取数据时，如果discardBytes > 0，则会将缓冲区大小设置为端点最大包大小sg + discardBytes，
+     * 并且拷贝数据忽略后面的discardBytes个字节数据。目前只在单片机中断传输中使用，并且可能跟设备有关！
+     * */
+    uint8_t discardBytes = 0;      
+    /**
+     * 在使用单片机USB传输时，连续发送命令，单片机可能无法处理。读取和写入的时间间隔虽然可以由外部调用来控制， 
+     * 但是内部传输数据时如果存在分包，则存在多次命令写入，即使外部只调用一次read或write，因此添加这个字段进行控制。
+     * 例如：单片机每次只能写入64字节，并且处理时间需要5ms，则设置cmdInterval = 5，当写入100字节的数据时，先写64字节，sleep(5),
+     * 再写36字节...。目前只在中断传输和批量传输中使用，跟设备处理性能有关。
+     */
+    uint8_t cmdInterval = 0;        
 };
 ```
 

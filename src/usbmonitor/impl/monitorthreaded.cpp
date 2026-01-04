@@ -95,7 +95,7 @@ void MonitorWorker::onStartMonitor() {
                 usbMonitor->deviceDetached(id);
             }
         }
-        // libusb_free_device_list(devLists, 1);
+//         libusb_free_device_list(devLists, 1);
         updateMonitorIds();
         updateMonitorClassed();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
