@@ -116,4 +116,8 @@ void UsbDevice::write(const QByteArray &data) const {
     }
 }
 
+bool UsbDevice::isDevValid() const {
+    return validFlag.load(std::memory_order_relaxed);
+}
+
 QT_USB_NAMESPACE_END
