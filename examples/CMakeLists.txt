@@ -20,8 +20,5 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(Test
     Qt5::Core
-    ${USB_LIB}
+    QtUsb
 )
-
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC QTUSB_STATIC)

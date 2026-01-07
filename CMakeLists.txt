@@ -81,7 +81,13 @@ if(NOT USB_LIB)
     message(FATAL_ERROR "Cannot find libusb")
 endif()
 
-add_library(QtUsb ${QtUsb_HEADERS} ${QtUsb_SOURCES})
+if(BUILD_SHARED_LIBS)
+    set(_build_type SHARED)
+else()
+    set(_build_type STATIC)
+endif()
+
+add_library(QtUsb ${_build_type} ${QtUsb_HEADERS} ${QtUsb_SOURCES})
 
 target_include_directories(QtUsb
     PUBLIC
@@ -112,7 +118,7 @@ set_target_properties(QtUsb PROPERTIES
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(QtUsb PRIVATE QTUSB_EXPORTS)
 else()
-    target_compile_definitions(QtUsb PRIVATE QTUSB_STATIC)
+    target_compile_definitions(QtUsb PUBLIC QTUSB_STATIC)
 endif()
 
 # Package config

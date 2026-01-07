@@ -44,7 +44,6 @@
 find_package(QtUsb REQUIRED)
 //...
 target_link_libraries (${PROJECT_NAME} PUBLIC QtUsb::QtUsb)
-// 如果链接静态库，添加：target_compile_definitions(${PROJECT_NAME} PUBLIC QTUSB_STATIC)、
 ```
 - 包含头文件
 ```c++
