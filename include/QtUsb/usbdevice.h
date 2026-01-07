@@ -8,10 +8,11 @@
 
 QT_USB_NAMESPACE_BEGIN
 class IoCommand;
+
 class UsbDescriptor;
 
 class QTUSB_API UsbDevice : public QObject {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit UsbDevice(UsbId usbId, QObject *parent = nullptr);
@@ -38,9 +39,15 @@ public:
 
     /**
      * @brief 设备配置之后进行数据写入操作
-     * @param data
+     * @param data, 右值传递待写入数据，在数据量较大时，减少内存拷贝
      */
     void write(QByteArray &&data) const;
+
+    /**
+     * @brief 设备配置之后进行数据写入操作
+     * @param data，左值传递写入数据, 数据量少时，且方便外部调用
+     */
+    void write(const QByteArray &data) const;
 
     /**
      * @brief 开启/关闭传输速度打印
@@ -61,10 +68,19 @@ private:
      */
     void openDevice();
 
+    /**
+     * @brief 检查IO操作是否可以进行，当设备断开或打开失败时，IO操作检查将失败
+     * @param isRead 是否是读取操作
+     * @return true: 设备IO可用 false: IO不可用
+     */
+    bool checkIOEnabled(bool isRead) const;
 signals:
+
     void readFinished(const QByteArray &data);
+
     void writeFinished();
-    void errorOccurred(int errorCode, const QString& errorString);
+
+    void errorOccurred(int errorCode, const QString &errorString);
 
 private:
     std::atomic<bool> validFlag{false};

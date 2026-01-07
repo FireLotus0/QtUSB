@@ -51,27 +51,15 @@ void UsbDevice::setConfiguration(ActiveUSBConfig newCfg) {
 }
 
 void UsbDevice::read() const {
-    if (!validFlag.load(std::memory_order_relaxed)) {
-        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
-        return;
+    if(checkIOEnabled(true)) {
+        ioCommand->read();
     }
-    if (usbCfg.interface == 0xFF) {
-        qCWarning(usbCategory) << "UsbDevice::read: usb configuration is not set!";
-        return;
-    }
-    ioCommand->read();
 }
 
 void UsbDevice::write(QByteArray &&data) const {
-    if (!validFlag.load(std::memory_order_relaxed)) {
-        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
-        return;
+    if(checkIOEnabled(false)) {
+        ioCommand->write(std::move(data));
     }
-    if (usbCfg.interface == 0xFF) {
-        qCWarning(usbCategory) << "UsbDevice::write: usb configuration is not set!";
-        return;
-    }
-    ioCommand->write(std::move(data));
 }
 
 void UsbDevice::openDevice() {
@@ -107,6 +95,24 @@ void UsbDevice::printInfo() const {
         UsbDescriptor::descriptors[id].printInfo();
     } else {
         qCWarning(usbCategory) << "UsbDescriptor::descriptors do not contains id: id=" << id;
+    }
+}
+
+bool UsbDevice::checkIOEnabled(bool isRead) const {
+    if (!validFlag.load(std::memory_order_relaxed)) {
+        qCWarning(usbCategory) << "UsbDevice::setConfiguration: device is invalid!";
+        return false;
+    }
+    if (usbCfg.interface == 0xFF) {
+        qCWarning(usbCategory) << QString("UsbDevice::%1: usb configuration is not set!").arg(isRead ? "read" : "write");
+        return false;
+    }
+    return true;
+}
+
+void UsbDevice::write(const QByteArray &data) const {
+    if(checkIOEnabled(false)) {
+        ioCommand->write(data);
     }
 }
 

@@ -23,6 +23,8 @@ public:
 
     void write(QByteArray &&data);
 
+    void write(const QByteArray &data);
+
     void setSpeedPrintEnable(bool enable);
 
 signals:
@@ -36,7 +38,8 @@ private slots:
 private:
     void initContext();
 
-    void makeIoData(TransferDirection direction, QByteArray&& data);
+    template<typename T>
+    void makeIoData(TransferDirection direction, T&& data);
 
     void doTransfer(bool read);
 
@@ -44,6 +47,7 @@ private:
 
     void releaseContext();
 
+    bool checkDevValid(bool isRead) const;
 private:
     struct IoContext {
         TransferContext* readContext{nullptr}, *writeContext{nullptr}, *transferContext{nullptr};
