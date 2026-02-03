@@ -28,6 +28,7 @@ public:
 
     /**
      * @brief 设置设备使用的配置
+     * @note 如果需要开启速度打印，需要先调用此函数，之后再调用setSpeedPrintEnable()
      * @param newCfg
      */
     void setConfiguration(ActiveUSBConfig newCfg);
@@ -51,6 +52,7 @@ public:
 
     /**
      * @brief 开启/关闭传输速度打印
+     * @note 需要在setConfiguration()之后调用才生效
      * @param enable
      */
     void setSpeedPrintEnable(bool enable);

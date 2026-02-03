@@ -139,20 +139,20 @@ struct QTUSB_API ActiveUSBConfig {
 ### 3. UsbDevice
 USB设备对象，提供接口进行数据传输。
 
-| 接口               | 说明                                                                                                                 |
-|------------------|--------------------------------------------------------------------------------------------------------------------|
-| setValid         | 当设备拔除时，UsbDevManager会将设备设置为无效（考虑到用户可能会将QSharedPointer<UsbDevice>放到线程中使用，<br/>所以这是一个原子操作），IO操作会被忽略，***使用者通常不需要调用*** |
-| setConfiguration | 选择需要的配置，参数为   ActiveUSBConfig结构体                                                                                   |
-| read             | 读取数据，当设备拔出或没有选择配置时，读取操作无效                                                                                          |
-| write            | 写入数据，当设备拔出或没有选择配置时，写入操作无效                                                                                          |
-| printInfo        | 打印设备配置新信息                                              |
-
+| 接口                    | 说明                                                                                                                 |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------|
+| setValid              | 当设备拔除时，UsbDevManager会将设备设置为无效（考虑到用户可能会将QSharedPointer<UsbDevice>放到线程中使用，<br/>所以这是一个原子操作），IO操作会被忽略，***使用者通常不需要调用*** |
+| setConfiguration      | 选择需要的配置，参数为   ActiveUSBConfig结构体                                                                                   |
+| read                  | 读取数据，当设备拔出或没有选择配置时，读取操作无效                                                                                          |
+| write                 | 写入数据，当设备拔出或没有选择配置时，写入操作无效                                                                                          |
+| printInfo             | 打印设备配置信息,ActiveUSBConfig结构体中字段内容来源于此                                                                               |
+| setSpeedPrintEnable   | 打印每秒接收到的数据量，单位为KB/S或MB/S，***注意：此函数在setConfiguration()之后才能生效***                                                     |   
 
 | 信号              | 说明     |
 |-----------------|--------|
 |  void readFinished(const QByteArray &data)    | 数据读取完成 |
 | void writeFinished() | 数据写入完成 |
-| void errorOccurred(int errorCode, const QString& errorString) | 数据传输错误 |
+| void errorOccurred(int errorCode, const QString& errorString) | USB错误  |
 
 ---
 ## 示例代码
