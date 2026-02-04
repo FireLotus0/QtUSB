@@ -94,6 +94,9 @@ private:
 private:
     UsbMonitor *monitor;
     QMap<UsbId, QSharedPointer<UsbDevice>> devices;
+    // 当设备断开，将devices[id]放入到这里，保证最终的释放是UsbDevManager，如果将QSharedPointer<UsbDevice>放入到线程中，在线程退出时，如果QSharedPointer引用计数为0，
+    // 就会导致在线程中释放对应的UsbDevice，从而出现跨线程操。
+    QList<QSharedPointer<UsbDevice>> toDeleteDevs;
 };
 
 QT_USB_NAMESPACE_END

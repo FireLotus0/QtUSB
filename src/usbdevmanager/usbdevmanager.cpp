@@ -7,8 +7,7 @@
 #include "descriptor/usbdescriptor.h"
 
 QT_USB_NAMESPACE_BEGIN
-UsbDevManager::UsbDevManager(QObject *parent)
-{
+UsbDevManager::UsbDevManager(QObject *parent) {
     libusb_context *ctx = nullptr;
     if (libusb_init(&ctx) < 0) {
         qCCritical(usbCategory) << "libusb_init failed";
@@ -26,12 +25,15 @@ UsbDevManager::UsbDevManager(QObject *parent)
 }
 
 UsbDevManager::~UsbDevManager() {
-   if(monitor !=  nullptr) {
-       releaseUsbCxt();
-   }
+    for (auto &dev: toDeleteDevs) {
+        dev.reset();
+    }
+    if (monitor != nullptr) {
+        releaseUsbCxt();
+    }
 }
 
-UsbDevManager & UsbDevManager::instance() {
+UsbDevManager &UsbDevManager::instance() {
     static UsbDevManager instance;
     return instance;
 }
@@ -58,8 +60,9 @@ void UsbDevManager::onDeviceAttached(UsbId id) {
 }
 
 void UsbDevManager::onDeviceDetached(UsbId id) {
-    if(devices.contains(id)) {
+    if (devices.contains(id)) {
         devices[id]->setValid(false);
+        toDeleteDevs.push_back(std::move(devices[id]));
         devices.remove(id);
     }
     emit deviceDetached(id);
@@ -67,16 +70,22 @@ void UsbDevManager::onDeviceDetached(UsbId id) {
 
 void UsbDevManager::setLogLevel(UsbLogLevel level) {
     QString rule = "usb.category.debug=true";
-    switch((int)level) {
-        case (int)UsbLogLevel::INFO: rule =  "usb.category.debug=false\n"
-                                             "usb.category.info=true"; break;
-        case (int)UsbLogLevel::WARNING: rule =  "usb.category.debug=false\n"
-                                                "usb.category.info=false\n"
-                                                "usb.category.warning=true";  break;
-        case (int)UsbLogLevel::CRITICAL: rule =  "usb.category.debug=false\n"
-                                                 "usb.category.info=false\n"
-                                                 "usb.category.warning=false\n"
-                                                 "usb.category.critical=true"; break;
+    switch ((int) level) {
+        case (int) UsbLogLevel::INFO:
+            rule = "usb.category.debug=false\n"
+                   "usb.category.info=true";
+            break;
+        case (int) UsbLogLevel::WARNING:
+            rule = "usb.category.debug=false\n"
+                   "usb.category.info=false\n"
+                   "usb.category.warning=true";
+            break;
+        case (int) UsbLogLevel::CRITICAL:
+            rule = "usb.category.debug=false\n"
+                   "usb.category.info=false\n"
+                   "usb.category.warning=false\n"
+                   "usb.category.critical=true";
+            break;
     }
     QLoggingCategory::setFilterRules(rule);
 }
@@ -90,12 +99,12 @@ void UsbDevManager::removeMonitorClass(DeviceType deviceType) {
 }
 
 void UsbDevManager::releaseUsbCxt() {
-    for (auto device : devices) {
+    for (auto device: devices) {
         device->setValid(false);
     }
     qCDebug(usbCategory) << "UsbDevManager released!";
     devices.clear();
-    if(monitor) {
+    if (monitor) {
         delete monitor;
         monitor = nullptr;
         libusb_exit(nullptr);

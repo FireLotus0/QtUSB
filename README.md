@@ -120,15 +120,15 @@ struct QTUSB_API ActiveUSBConfig {
 这是一个单例类。主要是代替用户进行USB设备管理。当用户从UsbDevManager获取到设备QSharedPointer<UsbDevice>，***需要检查是否为空***。
 当调用UsbDevice::setConfiguration()时，会自动打开设备。通过UsbDevice::printInfo()可以打印设备配置信息，在UsbDevice::setConfiguration时，可以根据这些信息进行设置***。
 
-| 接口            | 说明                                                                   |
-|---------------|----------------------------------------------------------------------|
-| addMonitorId     | 添加需要监听的设备                                                            |
-| removeMonitorId | 取消对指定设备的监听                                                           |
-| addMonitorClass     | 根据设备类别添加监听                                                           |
-| removeMonitorClass | 取消对指定类别的监听                                                           |
-| getDevice | 获取设备， 返回QSharedPointer<UsbDevice>，需要检查是否为nullptr(当设备不存在时为空)          |
-| setLogLevel | 设置内部日志输出级别： DEBUG，INFO，WARNING，CRITICAL                              |
-| releaseUsbCxt | 程序退出时会调用此函数释放libusb，***特别地，当程序异常终止（例如Ctrl C按下），用户需要监听此类事件，然后调用此函数*** |
+| 接口            | 说明                                                                                |
+|---------------|-----------------------------------------------------------------------------------|
+| addMonitorId     | 添加需要监听的设备                                                                         |
+| removeMonitorId | 取消对指定设备的监听                                                                        |
+| addMonitorClass     | 根据设备类别添加监听                                                                        |
+| removeMonitorClass | 取消对指定类别的监听                                                                        |
+| getDevice | 获取设备， 返回QSharedPointer<UsbDevice>，需要检查是否为nullptr(当设备不存在时为空)，获取到的设备对象可以在其他线程里面安全使用 |
+| setLogLevel | 设置内部日志输出级别： DEBUG，INFO，WARNING，CRITICAL                                           |
+| releaseUsbCxt | 程序退出时会调用此函数释放libusb，***特别地，当程序异常终止（例如Ctrl C按下），用户需要监听此类事件，然后调用此函数***              |
 
 
 | 信号              | 说明                                                         |

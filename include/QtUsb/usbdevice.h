@@ -63,7 +63,7 @@ public:
     void printInfo() const;
 
     /**
-     * @brief 检查设备是否有效(设备打开成功，并且当前没有被拔除), 无效(设备打开失败，或断开连接)
+     * @brief 检查设备是否有效(设备通过setConfiguration选择了有效的配置，并且没有被移除)
      * @return true: 有效
      */
     bool isDevValid() const;
