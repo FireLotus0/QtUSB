@@ -2,31 +2,35 @@
 
 #include <qloggingcategory.h>
 
-QT_USB_NAMESPACE_BEGIN
+#include "QtUsb/usbdevice.h"
 
+QT_USB_NAMESPACE_BEGIN
 const QLoggingCategory &usbCategory();
 
-IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device_handle *handle, QObject *parent)
-        : descriptorData(descriptorData), handle(handle), QObject(parent) {
+IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device_handle *handle, UsbDevice* device, QObject *parent)
+        : descriptorData(descriptorData), handle(handle), QObject(parent)
+{
     initSpeedTimer();
+
+    connect(this, &IoCommand::transferFinished, this, &IoCommand::onTransferFinished);
+    eventDelegate.readFinishedDelegate.add(&UsbDevice::readFinished, device);
+    eventDelegate.writeFinishedDelegate.add(&UsbDevice::writeFinished, device);
+    eventDelegate.errorOccurredDelegate.add(&UsbDevice::errorOccurred, device);
+    eventDelegate.transferFinishDelegate.add(&IoCommand::transferFinished, this);
 }
 
 void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
     config = cfg;
     if (!descriptorData.configurations.contains(config.configuration)) {
-        qCWarning(usbCategory) << "Invalid configuration: " << config.configuration << " support configurations: "
-                               << descriptorData.configurations.keys();
+        qCWarning(usbCategory) << "Invalid configuration: " << config.configuration << " support configurations: " << descriptorData.configurations.keys();
         return;
-    } else {
-        curCfg = &descriptorData.configurations[config.configuration];
     }
+    curCfg = &descriptorData.configurations[config.configuration];
     if (!curCfg->interfaces.contains(config.interface)) {
-        qCWarning(usbCategory) << "Invalid interface: " << config.interface << " support interfaces: "
-                               << curCfg->interfaces.keys();
+        qCWarning(usbCategory) << "Invalid interface: " << config.interface << " support interfaces: " << curCfg->interfaces.keys();
         return;
-    } else {
-        curInterface = &curCfg->interfaces[config.interface];
     }
+    curInterface = &curCfg->interfaces[config.interface];
     initContext();
 }
 
@@ -34,21 +38,15 @@ void IoCommand::initContext() {
     releaseContext();
     // 半双工并且需要对命令进行排队处理，否则即使是半双工模式，写命令的优先级高于读命令
     if (!descriptorData.fullDuplexSupported && config.queuedCommands) {
-        ioContext.transferContext = new TransferContext(config.discardBytes, config.cmdInterval);
-        connect(ioContext.transferContext, &TransferContext::transferFinished, this,
-                &IoCommand::onTransferFinished);
+        ioContext.transferContext = new TransferContext(config.discardBytes, config.cmdInterval, config.timeout, &eventDelegate);
     } else {
-        ioContext.readContext = new TransferContext(config.discardBytes, config.cmdInterval);
-        connect(ioContext.readContext, &TransferContext::transferFinished, this, &IoCommand::onTransferFinished);
-
+        ioContext.readContext = new TransferContext(config.discardBytes, config.cmdInterval, config.timeout, &eventDelegate);
         if (!descriptorData.fullDuplexSupported) {
             // 半双工模式下，实现写命令优先于读取命令
             ioContext.writeContext = ioContext.readContext;
         } else {
             // 全双工模式
-            ioContext.writeContext = new TransferContext(config.discardBytes, config.cmdInterval);
-            connect(ioContext.writeContext, &TransferContext::transferFinished, this,
-                    &IoCommand::onTransferFinished);
+            ioContext.writeContext = new TransferContext(config.discardBytes, config.cmdInterval, config.timeout, &eventDelegate);
         }
     }
     // 全双工模式或者半双工并且需要写优先级高于读
@@ -117,20 +115,21 @@ void IoCommand::doTransfer(bool read) {
     }
 }
 
-void IoCommand::onTransferFinished(const IoData &data) {
-    if (speedPrintable) {
-        bytesCounter += data.data.size();
+void IoCommand::onTransferFinished(TransferDirection direction, int transferred) {
+    auto isRead = direction == TransferDirection::DEVICE_TO_HOST;
+    if (!isRead && writeSpeedPrintable) {
+        bytesWritten += transferred;
+    } else if (isRead && readSpeedPrintable) {
+        bytesRead += transferred;
     }
-    if (data.transferDirection == TransferDirection::DEVICE_TO_HOST) {
+
+    if (isRead) {
         if (descriptorData.fullDuplexSupported || !config.queuedCommands) {
             ioContext.readQueue.dequeue();
             ioContext.isReading = false;
         } else {
             ioContext.transferQueue.dequeue();
             ioContext.isTransferring = false;
-        }
-        if (data.resultCode == LIBUSB_SUCCESS) {
-            emit readFinished(data.data);
         }
     } else {
         if (descriptorData.fullDuplexSupported || !config.queuedCommands) {
@@ -140,47 +139,53 @@ void IoCommand::onTransferFinished(const IoData &data) {
             ioContext.transferQueue.dequeue();
             ioContext.isTransferring = false;
         }
-        if (data.resultCode == LIBUSB_SUCCESS) {
-            emit writeFinished();
-        }
     }
     if (config.queuedCommands) {
-        doTransfer(data.transferDirection == TransferDirection::DEVICE_TO_HOST);
+        doTransfer(isRead);
     } else {
         if (ioContext.writeQueue.empty()) {
-            doTransfer(data.transferDirection == TransferDirection::DEVICE_TO_HOST);
+            doTransfer(isRead);
         } else {
             // 优先传输写命令
             doTransfer(false);
         }
     }
-    if (data.resultCode != LIBUSB_SUCCESS) {
-        emit errorOccurred(data.resultCode, QString(libusb_error_name(data.resultCode)));
-    }
 }
 
-void IoCommand::setSpeedPrintEnable(bool enable) {
-    speedPrintable = enable;
-    if (enable) {
+void IoCommand::setSpeedPrintEnable(bool readSpeed, bool writtenSpeed) {
+    writeSpeedPrintable = writtenSpeed;
+    readSpeedPrintable = readSpeed;
+    if (readSpeed || writtenSpeed) {
         speedPrintTimer.start();
     } else {
         speedPrintTimer.stop();
     }
 }
 
+void IoCommand::printSpeed(bool isWriteSpeed) {
+    auto* count = isWriteSpeed ? &bytesWritten : &bytesRead;
+    double speed = 0.0;
+    if (static_cast<double>(*count) <= bytesMB) {
+        speed = (*count) / bytesMB;
+        speedUnit = "mb/s";
+    } else {
+        speed = (*count) / 1024.0;
+        speedUnit = "kb/s";
+    }
+    qCInfo(usbCategory).noquote() << (isWriteSpeed ? "write speed: " : "read speed: ") << QString::number(speed, 'f', 3) << speedUnit;
+    *count = 0;
+}
+
+
 void IoCommand::initSpeedTimer() {
     speedPrintTimer.setInterval(1000);
     speedPrintTimer.callOnTimeout([&] {
-        double speed = 0.0;
-        if (bytesCounter >= bytesMB) {
-            speed = (bytesCounter * 1.0) / bytesMB;
-            speedUnit = "mb/s";
-        } else {
-            speed = (bytesCounter * 1.0) / 1024;
-            speedUnit = "kb/s";
+        if (writeSpeedPrintable) {
+            printSpeed(true);
         }
-        qCInfo(usbCategory).noquote() << "read speed: " << QString::number(speed, 'f', 3) << speedUnit;
-        bytesCounter = 0;
+        if (readSpeedPrintable) {
+            printSpeed(false);
+        }
     });
 }
 

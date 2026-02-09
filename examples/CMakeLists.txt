@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2...4.0)
 
 project(Test)
 
+set(CMAKE_AUTOMOC ON)
+
 include_directories(${CMAKE_SOURCE_DIR}/include/)
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 

@@ -32,7 +32,7 @@ public slots:
 
 //        device->write(QByteArray::fromHex("fefe03001500c07194feff"));
         // 开启速度打印
-        device->setSpeedPrintEnable(true);
+        device->setSpeedPrintEnable(true, true);
 //        QTimer::singleShot(100, [&] {
             readUsbTimer.start();
 //        });

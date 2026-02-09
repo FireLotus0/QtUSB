@@ -7,7 +7,7 @@ QT_USB_NAMESPACE_BEGIN
 
 class SyncControlTransfer : public StrategyBase {
 public:
-    explicit SyncControlTransfer(QObject *parent = nullptr);
+    explicit SyncControlTransfer(int timeout, EventDelegate* eventDelegate, QObject *parent = nullptr);
 
     void transfer(const IoData &request) override;
 };

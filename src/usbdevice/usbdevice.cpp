@@ -77,16 +77,13 @@ void UsbDevice::openDevice() {
     }
     libusb_set_auto_detach_kernel_driver(handle, 1);
     const auto& descriptorData = UsbDescriptor::descriptors[id];
-    ioCommand = new IoCommand(descriptorData.getDescriptorData(), handle);
-    connect(ioCommand, &IoCommand::readFinished, this, &UsbDevice::readFinished);
-    connect(ioCommand, &IoCommand::writeFinished, this, &UsbDevice::writeFinished);
-    connect(ioCommand, &IoCommand::errorOccurred, this, &UsbDevice::errorOccurred);
+    ioCommand = new IoCommand(descriptorData.getDescriptorData(), handle, this);
     setValid(true);
 }
 
-void UsbDevice::setSpeedPrintEnable(bool enable) {
+void UsbDevice::setSpeedPrintEnable(bool readSpeed, bool writeSpeed) {
     if(ioCommand) {
-        ioCommand->setSpeedPrintEnable(enable);
+        ioCommand->setSpeedPrintEnable(readSpeed, writeSpeed);
     }
 }
 
@@ -118,6 +115,14 @@ void UsbDevice::write(const QByteArray &data) const {
 
 bool UsbDevice::isDevValid() const {
     return validFlag.load(std::memory_order_relaxed);
+}
+
+UsbId UsbDevice::getUsbId() const {
+    return id;
+}
+
+ActiveUSBConfig UsbDevice::getCurCfg() const {
+    return usbCfg;
 }
 
 QT_USB_NAMESPACE_END

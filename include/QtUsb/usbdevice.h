@@ -12,7 +12,7 @@ class IoCommand;
 class UsbDescriptor;
 
 class QTUSB_API UsbDevice : public QObject {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit UsbDevice(UsbId usbId, QObject *parent = nullptr);
@@ -55,7 +55,7 @@ public:
      * @note 需要在setConfiguration()之后调用才生效
      * @param enable
      */
-    void setSpeedPrintEnable(bool enable);
+    void setSpeedPrintEnable(bool readSpeed, bool writeSpeed);
 
     /**
      * @brief 打印USB配置信息
@@ -67,6 +67,16 @@ public:
      * @return true: 有效
      */
     bool isDevValid() const;
+
+    /**
+     * @brief 返回设备ID
+     */
+    UsbId getUsbId() const;
+
+    /**
+     * @brief 返回当前配置
+     */
+    ActiveUSBConfig getCurCfg() const;
 private:
     /**
      * @brief 打开设备
@@ -81,8 +91,8 @@ private:
      * @return true: 设备IO可用 false: IO不可用
      */
     bool checkIOEnabled(bool isRead) const;
-signals:
 
+signals:
     void readFinished(const QByteArray &data);
 
     void writeFinished();

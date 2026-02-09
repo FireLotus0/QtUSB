@@ -4,20 +4,23 @@
 #include "QtUsb/libusb.h"
 #include "transfer/transfercontext.h"
 #include "descriptor/descriptorbase/descriptordata.h"
+#include "utils/funcdelegate.h"
 #include <qobject.h>
 #include <qtimer.h>
 #include <QQueue>
 
 QT_USB_NAMESPACE_BEGIN
+class UsbDevice;
 
 class IoCommand : public QObject {
-Q_OBJECT
+    Q_OBJECT
+
 public:
-    explicit IoCommand(const DescriptorData& descriptorData, libusb_device_handle* handle, QObject *parent = nullptr);
+    explicit IoCommand(const DescriptorData &descriptorData, libusb_device_handle *handle, UsbDevice *device, QObject *parent = nullptr);
 
     ~IoCommand();
 
-    void setConfiguration(const ActiveUSBConfig& cfg);
+    void setConfiguration(const ActiveUSBConfig &cfg);
 
     void read();
 
@@ -25,21 +28,19 @@ public:
 
     void write(const QByteArray &data);
 
-    void setSpeedPrintEnable(bool enable);
+    void setSpeedPrintEnable(bool readSpeed, bool writtenSpeed);
 
 signals:
-    void readFinished(const QByteArray& data);
-    void writeFinished();
-    void errorOccurred(int errorCode, const QString& errorString);
+    void transferFinished(TransferDirection direction, int transferred);
 
 private slots:
-    void onTransferFinished(const IoData& data);
+    void onTransferFinished(TransferDirection direction, int transferred);
 
 private:
     void initContext();
 
     template<typename T>
-    void makeIoData(TransferDirection direction, T&& data);
+    void makeIoData(TransferDirection direction, T &&data);
 
     void doTransfer(bool read);
 
@@ -48,27 +49,34 @@ private:
     void releaseContext();
 
     bool checkDevValid(bool isRead) const;
+
+    void printSpeed(bool isWriteSpeed);
+
 private:
     struct IoContext {
-        TransferContext* readContext{nullptr}, *writeContext{nullptr}, *transferContext{nullptr};
+        TransferContext *readContext{nullptr}, *writeContext{nullptr}, *transferContext{nullptr};
         QQueue<IoData> readQueue, writeQueue, transferQueue;
         bool isReading{false}, isWriting{false}, isTransferring{false};
     };
 
 private:
     DescriptorData descriptorData;
-    ConfigurationData* curCfg{nullptr};
-    InterfaceData* curInterface{nullptr};
+    ConfigurationData *curCfg{nullptr};
+    InterfaceData *curInterface{nullptr};
 
     ActiveUSBConfig config;
     IoContext ioContext;
-    libusb_device_handle* handle;
+    libusb_device_handle *handle;
 
-    bool speedPrintable = false;
+    bool writeSpeedPrintable = false;
+    bool readSpeedPrintable = false;
     QTimer speedPrintTimer;
-    quint64 bytesCounter = 0;
-    const quint64 bytesMB = 1024 * 1024;
+
+    int bytesWritten = 0, bytesRead = 0;
+    const double bytesMB = 1024 * 1024;
     QString speedUnit = "mb/s";
+
+    EventDelegate eventDelegate;
 };
 
 QT_USB_NAMESPACE_END

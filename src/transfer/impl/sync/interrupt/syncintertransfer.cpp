@@ -3,8 +3,8 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-    SyncInterTransfer::SyncInterTransfer(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent)
-            : StrategyBase(discardBytes, cmdInterval, parent) {
+    SyncInterTransfer::SyncInterTransfer(uint8_t discardBytes, uint8_t cmdInterval, int timeout, EventDelegate* eventDelegate, QObject *parent)
+            : StrategyBase(discardBytes, cmdInterval, timeout, eventDelegate, parent) {
     }
 
     void SyncInterTransfer::transfer(const IoData &request) {
@@ -15,9 +15,7 @@ QT_USB_NAMESPACE_BEGIN
             int totalTransferred = 0;
             int expectWrite;
             while (totalTransferred < dataSize) {
-                expectWrite = dataSize - totalTransferred > request.maxPacketSize ? request.maxPacketSize : dataSize -
-                                                                                                            totalTransferred;
-
+                expectWrite = dataSize - totalTransferred > request.maxPacketSize ? request.maxPacketSize : dataSize - totalTransferred;
                 if(expectWrite < request.maxPacketSize) {
                     QByteArray tmp;
                     tmp.resize(request.maxPacketSize);
@@ -30,7 +28,8 @@ QT_USB_NAMESPACE_BEGIN
                                                                   (unsigned char*)request.data.data() + totalTransferred, expectWrite, &transferred, timeout);
                 }
                 if (result.resultCode != LIBUSB_SUCCESS) {
-                    emit transferFinished(result);
+                    eventDelegate->errorOccurredDelegate(result.resultCode, QString(libusb_error_name(result.resultCode)));
+                    eventDelegate->transferFinishDelegate(request.transferDirection, 0);
                     return;
                 }
                 totalTransferred += (transferred - discardBytes);
@@ -38,7 +37,8 @@ QT_USB_NAMESPACE_BEGIN
                     QThread::msleep(cmdInterval);
                 }
             }
-            emit transferFinished(result);
+            eventDelegate->writeFinishedDelegate();
+            eventDelegate->transferFinishDelegate(request.transferDirection, totalTransferred);
         } else {
             if(discardBytes > 0) {
                 readCache.resize(request.maxPacketSize + discardBytes);
@@ -46,21 +46,22 @@ QT_USB_NAMESPACE_BEGIN
                 result.resultCode = libusb_interrupt_transfer(request.handle, request.address,
                                                               (unsigned char *) readCache.data(), readCacheSize,
                                                               &transferred, timeout);
-                if (result.resultCode == LIBUSB_SUCCESS) {
-                    result.data = QByteArray::fromRawData(readCache.data(), transferred - discardBytes);
-                }
-                emit transferFinished(result);
             } else {
                 adjustReadCacheSz(request.maxPacketSize);
                 readCache.fill(0);
                 result.resultCode = libusb_interrupt_transfer(request.handle, request.address,
                                                               (unsigned char *) readCache.data(), readCacheSize,
                                                               &transferred, timeout);
-                if (result.resultCode == LIBUSB_SUCCESS) {
-                    result.data = QByteArray::fromRawData(readCache.data(), transferred);
-                }
-                emit transferFinished(result);
             }
+            if (result.resultCode == LIBUSB_SUCCESS) {
+                transferred -= discardBytes;
+                result.data = QByteArray::fromRawData(readCache.data(), transferred);
+                eventDelegate->readFinishedDelegate(result.data);
+            } else {
+                transferred = 0;
+                eventDelegate->errorOccurredDelegate(result.resultCode, QString(libusb_error_name(result.resultCode)));
+            }
+            eventDelegate->transferFinishDelegate(result.transferDirection, transferred);
         }
     }
 

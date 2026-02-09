@@ -90,6 +90,7 @@ struct QTUSB_API ActiveUSBConfig {
     uint8_t interface = 0xFF;       // 接口
     uint8_t pointNumber = 0xFF;     // 端点
     int readCacheSize = 1024;       // 读取缓冲区大小
+    int timeout = 2000;             // 读写超时时间, ms
     bool queuedCommands{false};     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
     /*
      * 在使用单片机USB实现中断传输时，在Windows平台上，libusb返回实际传输（读/写）的

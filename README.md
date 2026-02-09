@@ -83,7 +83,8 @@ QtUsb/
 │   ├── transfer/                # 进行实际的数据传输：批量传输，中断传输，控制传输
 │   ├── usbdevice/               # 设备对象类
 │   ├── usbdevmanager/           # 设备管理，单例
-│   └── usbmonitor/              # 设备热插拔监听
+│   ├── usbmonitor/              # 设备热插拔监听
+│   └── utils/                   # 工具函数
 ├── examples/                    # 测试代码,用于本地调试
 ├── cmake/                       # CMake 模块和配置文件模板
 └── README.md                    # 项目说明文档
@@ -107,6 +108,7 @@ uint8_t configuration = 0xFF;   // 使用的配置ID
 uint8_t interface = 0xFF;       // 接口
 uint8_t pointNumber = 0xFF;     // 端点
 int readCacheSize = 1024;       // 读取缓冲区大小
+int timeout = 2000;             // 读取，写入时的超时时间，单位ms
 bool queuedCommands{ false };     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
 /*
  * 在使用单片机USB实现中断传输时，在Windows平台上，libusb返回实际传输（读/写）的
@@ -158,7 +160,11 @@ USB设备对象，提供接口进行数据传输。
 | read                | 读取数据，当设备拔出或没有选择配置时，读取操作无效                                                                              |
 | write               | 写入数据，当设备拔出或没有选择配置时，写入操作无效                                                                              |
 | printInfo           | 打印设备配置信息                                                                                               |
-| setSpeedPrintEnable | 打印每秒接收到的数据量，单位为KB/S或MB/S，***注意：此函数在setConfiguration()之后调用才能生效***                                       |   
+| setSpeedPrintEnable | 打印读取，写入速度，单位为KB/S或MB/S，***注意：此函数在setConfiguration()之后调用才能生效***                                         |   
+| getUsbId            | 返回设备ID        getCurCfg                                                                                |   
+| getCurCfg           | 返回当前配置                                                                                                 |   
+
+
 
 | 信号                                                            | 说明     |
 |---------------------------------------------------------------|--------|
@@ -199,7 +205,7 @@ public slots:
         device = UsbDevManager::instance().getDevice(id);
         if (device) {
             // 打印配置信息，在setConfiguration之前建议先打印相关信息
-            device->printInfo();
+            device->printInfo(true, true);
             // 开启读取速度打印
             device->setSpeedPrintEnable(true);
             // 连接IO操作相关的信号

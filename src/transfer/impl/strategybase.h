@@ -1,27 +1,26 @@
 #pragma once
 
 #include "QtUsb/datatypes.h"
+#include "utils/funcdelegate.h"
 #include <qobject.h>
 
 QT_USB_NAMESPACE_BEGIN
-
 class StrategyBase : public QObject {
-Q_OBJECT
+    Q_OBJECT
+
 public:
-    explicit StrategyBase(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent = nullptr);
+    explicit StrategyBase(uint8_t discardBytes, uint8_t cmdInterval, int timeout, EventDelegate *eventDelegate, QObject *parent = nullptr);
 
     virtual void transfer(const IoData &request) = 0;
 
     void setReadCacheSize(int size);
-
-signals:
-    void transferFinished(const IoData& rsponse);
 
 protected:
     // 自动调整读取缓冲区大小为最大包大小的整数倍
     void adjustReadCacheSz(int maxPacketSize);
 
 protected:
+    EventDelegate *eventDelegate;
     QAtomicInt readCacheSize = 1024;
     int timeout = 2000;
     uint8_t cmdInterval = 0;

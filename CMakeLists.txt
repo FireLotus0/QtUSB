@@ -6,6 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
 include(GNUInstallDirs)
 
 option(BUILD_EXAMPLES "Build examples" ON)
@@ -36,6 +37,7 @@ set(QtUsb_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/control/synccontroltransfer.h
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/interrupt/syncintertransfer.h
     ${CMAKE_CURRENT_LIST_DIR}/src/iocommand/iocommand.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/utils/funcdelegate.h
 )
 
 set(QtUsb_SOURCES

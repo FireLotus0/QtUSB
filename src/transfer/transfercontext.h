@@ -2,6 +2,7 @@
 
 #include "QtUsb/usb_namespace.h"
 #include "transfer/impl/strategybase.h"
+#include "utils/funcdelegate.h"
 #include <qobject.h>
 #include <qmap.h>
 
@@ -12,7 +13,7 @@ class TransferWorker;
 class TransferContext : public QObject {
 Q_OBJECT
 public:
-    explicit TransferContext(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent = nullptr);
+    explicit TransferContext(uint8_t discardBytes, uint8_t cmdInterval, int timeout, EventDelegate* eventDelegate, QObject *parent = nullptr);
 
     ~TransferContext();
 
@@ -28,6 +29,8 @@ private:
     QMap<TransferStrategy, StrategyBase *> transferStrategies;
     friend class TransferWorker;
     TransferWorker *worker;
+    EventDelegate* eventDelegate;
+    int timeout = 2000;
 };
 
 class TransferWorker : public QObject {
@@ -40,6 +43,7 @@ public:
     void quit();
 
     void setReadCacheSize(int size);
+
 signals:
     void transfer(const IoData& data);
 

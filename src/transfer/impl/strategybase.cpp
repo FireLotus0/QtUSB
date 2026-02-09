@@ -2,10 +2,12 @@
 
 QT_USB_NAMESPACE_BEGIN
 
-StrategyBase::StrategyBase(uint8_t discardBytes, uint8_t cmdInterval, QObject *parent)
+StrategyBase::StrategyBase(uint8_t discardBytes, uint8_t cmdInterval, int timeout, EventDelegate *eventDelegate, QObject *parent)
         : QObject(parent)
         , discardBytes(discardBytes)
         , cmdInterval(cmdInterval)
+        , eventDelegate(eventDelegate)
+        , timeout(timeout)
 {
 }
 
