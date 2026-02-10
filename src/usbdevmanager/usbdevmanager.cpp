@@ -16,6 +16,7 @@ UsbDevManager::UsbDevManager(QObject *parent) {
         qRegisterMetaType<ControlRequestData>("ControlRequestData");
         qRegisterMetaType<IoData>("IoData");
         qRegisterMetaType<DeviceType>("DeviceType");
+        qRegisterMetaType<TransferDirection>("TransferDirection");
 
         monitor = new UsbMonitor(parent);
         connect(monitor, &UsbMonitor::deviceAttached, this, &UsbDevManager::onDeviceAttached);
