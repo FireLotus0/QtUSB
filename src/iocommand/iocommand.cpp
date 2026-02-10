@@ -165,7 +165,7 @@ void IoCommand::setSpeedPrintEnable(bool readSpeed, bool writtenSpeed) {
 void IoCommand::printSpeed(bool isWriteSpeed) {
     auto* count = isWriteSpeed ? &bytesWritten : &bytesRead;
     double speed = 0.0;
-    if (static_cast<double>(*count) <= bytesMB) {
+    if (static_cast<double>(*count) >= bytesMB) {
         speed = (*count) / bytesMB;
         speedUnit = "mb/s";
     } else {
