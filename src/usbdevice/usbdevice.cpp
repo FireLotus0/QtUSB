@@ -84,6 +84,8 @@ void UsbDevice::openDevice() {
 void UsbDevice::setSpeedPrintEnable(bool readSpeed, bool writeSpeed) {
     if(ioCommand) {
         ioCommand->setSpeedPrintEnable(readSpeed, writeSpeed);
+    } else {
+        qCWarning(usbCategory) << "Can`t enable print speed: call setConfiguration() first!";
     }
 }
 

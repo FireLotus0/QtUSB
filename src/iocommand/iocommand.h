@@ -11,6 +11,7 @@
 
 QT_USB_NAMESPACE_BEGIN
 class UsbDevice;
+class PeriodicReader;
 
 class IoCommand : public QObject {
     Q_OBJECT
@@ -22,16 +23,18 @@ public:
 
     void setConfiguration(const ActiveUSBConfig &cfg);
 
-    void read();
-
     void write(QByteArray &&data);
 
     void write(const QByteArray &data);
 
     void setSpeedPrintEnable(bool readSpeed, bool writtenSpeed);
 
+public slots:
+    void read();
+
 signals:
     void transferFinished(TransferDirection direction, int transferred);
+    void periodicRead();
 
 private slots:
     void onTransferFinished(TransferDirection direction, int transferred);
@@ -77,6 +80,8 @@ private:
     QString speedUnit = "mb/s";
 
     EventDelegate eventDelegate;
+
+    PeriodicReader* periodicReader{};
 };
 
 QT_USB_NAMESPACE_END

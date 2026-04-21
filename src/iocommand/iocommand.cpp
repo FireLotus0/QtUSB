@@ -1,4 +1,5 @@
 #include "iocommand.h"
+#include "periodicreader.h"
 
 #include <qloggingcategory.h>
 
@@ -13,6 +14,8 @@ IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device
     initSpeedTimer();
 
     connect(this, &IoCommand::transferFinished, this, &IoCommand::onTransferFinished);
+    connect(this, &IoCommand::periodicRead, this, &IoCommand::read);
+
     eventDelegate.readFinishedDelegate.add(&UsbDevice::readFinished, device);
     eventDelegate.writeFinishedDelegate.add(&UsbDevice::writeFinished, device);
     eventDelegate.errorOccurredDelegate.add(&UsbDevice::errorOccurred, device);
@@ -32,6 +35,16 @@ void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
     }
     curInterface = &curCfg->interfaces[config.interface];
     initContext();
+
+    if (cfg.periodicRead > 0) {
+        qCInfo(usbCategory) << "Start periodic read: interval=" << cfg.periodicRead;
+        if (!periodicReader) {
+            periodicReader = new PeriodicReader(this);
+        }
+        QTimer::singleShot(1000, [&] {
+            periodicReader->startPeriodicRead(true, cfg.periodicRead);
+        });
+    }
 }
 
 void IoCommand::initContext() {
@@ -58,6 +71,9 @@ void IoCommand::initContext() {
 }
 
 IoCommand::~IoCommand() {
+    if (periodicReader) {
+        periodicReader->startPeriodicRead(false);
+    }
     releaseContext();
 }
 

@@ -37,6 +37,7 @@ set(QtUsb_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/control/synccontroltransfer.h
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/interrupt/syncintertransfer.h
     ${CMAKE_CURRENT_LIST_DIR}/src/iocommand/iocommand.h
+    ${CMAKE_CURRENT_LIST_DIR}/src/iocommand/periodicreader.h
     ${CMAKE_CURRENT_LIST_DIR}/src/utils/funcdelegate.h
 )
 
@@ -60,6 +61,7 @@ set(QtUsb_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/control/synccontroltransfer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/transfer/impl/sync/interrupt/syncintertransfer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/iocommand/iocommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/iocommand/periodicreader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/usbdevice/usbdevice.cpp
 )
 

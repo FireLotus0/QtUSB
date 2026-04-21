@@ -102,7 +102,7 @@ QtUsb/
 - ***特别注意：需要兼顾数据采集和指令控制时，确保queuedCommands=false，这样写命令的优先级高于读命令，保证控制指令的及时性***
 
 ```c++
-// 调用setConfiguration()时，参数需要一个ActiveUSBConfig对象，建议先调用printInfo()打印配置信息
+// 调用setConfiguration()时，参数需要一个ActiveUSBConfig对象，建议先调用printInfo()打印USB配置信息
 struct QTUSB_API ActiveUSBConfig {
 uint8_t configuration = 0xFF;   // 使用的配置ID
 uint8_t interface = 0xFF;       // 接口
@@ -110,7 +110,7 @@ uint8_t pointNumber = 0xFF;     // 端点
 int readCacheSize = 1024;       // 读取缓冲区大小
 int timeout = 2000;             // 读取，写入时的超时时间，单位ms
 bool queuedCommands{ false };     // USB 2.0半双工传输，读写操作都是配对进行，USB 3.0支持全双工，设置为true，强制进行命令排队，实现命令同步
-/*
+/**
  * 在使用单片机USB实现中断传输时，在Windows平台上，libusb返回实际传输（读/写）的
  * 字节数时会多出1字节, Linux平台上正常。抓包分析，发送的数据确实多出一个字节，值为0。
  * 例如：写入64字节数据，但是Windows平台上写入了65字节数据，即使设备最大包大小仅为64字节，此时设置discardBytes=1，
@@ -126,6 +126,13 @@ uint8_t discardBytes = 0;
  *      再写36字节...。目前只在中断传输和批量传输中使用，跟设备处理性能有关。
  * */
 uint8_t cmdInterval = 0;
+    
+/**
+ * 定时读取：数据采集应用中，若设置了periodicRead， 则在设置配置成功后，
+ * 自动开启一个线程并定时读取数据，periodicRead单位为ms，
+ * 引入该参数是因为如果在主线程定时调用read()来进行数据采集，可能因为主线程进行某些耗时操作导致数据读取延时
+ */
+int periodicRead = 0;    
 };
 ```
 
@@ -203,16 +210,16 @@ public slots:
     void onDeviceAttached(UsbId id) {
         // 获取设备指针
         device = UsbDevManager::instance().getDevice(id);
-        if (device) {
+        if (device && device->isDevValid()) {
             // 打印配置信息，在setConfiguration之前建议先打印相关信息
             device->printInfo(true, true);
-            // 开启读取速度打印
-            device->setSpeedPrintEnable(true);
             // 连接IO操作相关的信号
             initUsbSig();
             // 设置配置
             device->setConfiguration({1, 0, 1, 8});
-            // 开启定时读取，此处为示例，不一定需要在这里开启定时器读取数据
+            // 开启速度打印
+            device->setSpeedPrintEnable(true, false);
+            // 开启定时读取示例
             readUsbTimer.start();
         }
     }
@@ -254,11 +261,11 @@ int main(int argc, char *argv[]) {
     UsbDevManager::instance().setLogLevel(QT_USB::UsbLogLevel::WARNING);
     UsbUser user;
 
-    // 设备插拔处理，在添加监听之前连接信号
+    // 设备热插拔处理，在开始监听之前先连接热插拔信号
     QObject::connect(&UsbDevManager::instance(), &UsbDevManager::deviceAttached, &user, &UsbUser::onDeviceAttached);
     QObject::connect(&UsbDevManager::instance(), &UsbDevManager::deviceDetached, &user, &UsbUser::onDeviceDetached);
 
-    // 添加需要监听插拔的设备ID
+    // 添加需要监听插拔的设备{PID, VID}
     UsbDevManager::instance().addMonitorId({0x4831, 0x4831});
 
     application.exec();
