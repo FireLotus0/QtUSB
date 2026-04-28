@@ -89,6 +89,14 @@ void UsbDevice::setSpeedPrintEnable(bool readSpeed, bool writeSpeed) {
     }
 }
 
+void UsbDevice::startPeriodicRead(bool start, int interval) const {
+    if(ioCommand) {
+        ioCommand->startPeriodicRead(start, interval);
+    } else {
+        qCWarning(usbCategory) << "Can`t call startPeriodicRead(): call setConfiguration() first!";
+    }
+}
+
 void UsbDevice::printInfo() const {
     if(UsbDescriptor::descriptors.contains(id)) {
         UsbDescriptor::descriptors[id].printInfo();

@@ -29,6 +29,8 @@ public:
 
     void setSpeedPrintEnable(bool readSpeed, bool writtenSpeed);
 
+    void startPeriodicRead(bool start, int interval);
+
 public slots:
     void read();
 

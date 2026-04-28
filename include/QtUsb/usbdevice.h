@@ -58,6 +58,15 @@ public:
     void setSpeedPrintEnable(bool readSpeed, bool writeSpeed);
 
     /**
+      * @brief 开启/关闭定时数据读取，主动开启或停止定时数据读取
+      * @note 需要在setConfiguration()之后调用才生效, setConfiguration()如何设置了periodicRead字段
+      *  ，则会自动开启定时读取，不需要手动再调用该函数，当需要主动停止时，例如设备断开等情况，调用此函数
+      * @param start 开启/关闭
+      * @param interval 定时间隔
+      */
+    void startPeriodicRead(bool start, int interval = 0) const;
+
+    /**
      * @brief 打印USB配置信息
      */
     void printInfo() const;

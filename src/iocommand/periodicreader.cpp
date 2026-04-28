@@ -20,6 +20,7 @@ void PeriodicReadWorker::onStartTimer(bool start, int interval) {
         if (timer) {
             timer->stop();
         }
+        qCInfo(usbCategory) << "Stop periodic read!";
     } else {
         if (!timer) {
             timer = new QTimer(this);

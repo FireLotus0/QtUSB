@@ -180,6 +180,14 @@ void IoCommand::setSpeedPrintEnable(bool readSpeed, bool writtenSpeed) {
     }
 }
 
+void IoCommand::startPeriodicRead(bool start, int interval) {
+    if (!periodicReader) {
+        qCWarning(usbCategory).noquote() << "startPeriodicRead ignored: periodicReader is not inited!";
+    } else {
+        periodicReader->startPeriodicRead(start, interval);
+    }
+}
+
 void IoCommand::printSpeed(bool isWriteSpeed) {
     auto *count = isWriteSpeed ? &bytesWritten : &bytesRead;
     double speed = 0.0;
