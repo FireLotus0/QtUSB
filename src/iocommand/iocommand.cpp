@@ -8,9 +8,8 @@
 QT_USB_NAMESPACE_BEGIN
 const QLoggingCategory &usbCategory();
 
-IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device_handle *handle, UsbDevice* device, QObject *parent)
-        : descriptorData(descriptorData), handle(handle), QObject(parent)
-{
+IoCommand::IoCommand(const QT_USB::DescriptorData &descriptorData, libusb_device_handle *handle, UsbDevice *device, QObject *parent)
+    : descriptorData(descriptorData), handle(handle), QObject(parent) {
     initSpeedTimer();
 
     connect(this, &IoCommand::transferFinished, this, &IoCommand::onTransferFinished);
@@ -37,13 +36,16 @@ void IoCommand::setConfiguration(const ActiveUSBConfig &cfg) {
     initContext();
 
     if (cfg.periodicRead > 0) {
-        qCInfo(usbCategory) << "Start periodic read: interval=" << cfg.periodicRead;
         if (!periodicReader) {
             periodicReader = new PeriodicReader(this);
         }
-        QTimer::singleShot(1000, [&] {
-            periodicReader->startPeriodicRead(true, cfg.periodicRead);
-        });
+        if (cfg.periodicReadStartAfter < 0) {
+            qCWarning(usbCategory) << "Invalid param: periodicReadStartAfter = " << cfg.periodicReadStartAfter;
+        } else {
+            QTimer::singleShot(cfg.periodicReadStartAfter, [&, cfg] {
+                periodicReader->startPeriodicRead(true, cfg.periodicRead);
+            });
+        }
     }
 }
 
@@ -78,21 +80,21 @@ IoCommand::~IoCommand() {
 }
 
 void IoCommand::read() {
-    if(checkDevValid(true)) {
+    if (checkDevValid(true)) {
         makeIoData(TransferDirection::DEVICE_TO_HOST, QByteArray{});
         doTransfer(true);
     }
 }
 
 void IoCommand::write(QByteArray &&data) {
-    if(checkDevValid(false)) {
+    if (checkDevValid(false)) {
         makeIoData(TransferDirection::HOST_TO_DEVICE, std::move(data));
         doTransfer(false);
     }
 }
 
 void IoCommand::write(const QByteArray &data) {
-    if(checkDevValid(false)) {
+    if (checkDevValid(false)) {
         makeIoData(TransferDirection::HOST_TO_DEVICE, data);
         doTransfer(false);
     }
@@ -179,7 +181,7 @@ void IoCommand::setSpeedPrintEnable(bool readSpeed, bool writtenSpeed) {
 }
 
 void IoCommand::printSpeed(bool isWriteSpeed) {
-    auto* count = isWriteSpeed ? &bytesWritten : &bytesRead;
+    auto *count = isWriteSpeed ? &bytesWritten : &bytesRead;
     double speed = 0.0;
     if (static_cast<double>(*count) >= bytesMB) {
         speed = (*count) / bytesMB;
@@ -247,7 +249,7 @@ void IoCommand::makeIoData(TransferDirection direction, T &&data) {
     ioData.transferDirection = direction;
     ioData.transferStrategy = transTypeToStrategy(true, endPoint.transferType);
     if constexpr (std::is_rvalue_reference_v<decltype(data)>) {
-        ioData.data =  std::move(data);
+        ioData.data = std::move(data);
     } else {
         ioData.data = data;
     }
@@ -264,5 +266,3 @@ void IoCommand::makeIoData(TransferDirection direction, T &&data) {
 
 
 QT_USB_NAMESPACE_END
-
-

@@ -132,7 +132,14 @@ uint8_t cmdInterval = 0;
  * 自动开启一个线程并定时读取数据，periodicRead单位为ms，
  * 引入该参数是因为如果在主线程定时调用read()来进行数据采集，可能因为主线程进行某些耗时操作导致数据读取延时
  */
-int periodicRead = 0;    
+int periodicRead = 0;  
+    
+/**
+ * 开启定时读取时（即periodicRead > 0），那么在连接成功后经过 periodicReadStartAfter ms
+ * 之后将在子线程中开始定时读取
+ */
+int periodicReadStartAfter = 100;    
+    
 };
 ```
 

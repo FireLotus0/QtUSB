@@ -29,6 +29,8 @@ void PeriodicReadWorker::onStartTimer(bool start, int interval) {
         }
         if (interval > 0) {
             timer->setInterval(interval);
+            timer->start();
+            qCInfo(usbCategory) << "Start periodic read: interval=" << interval << "ms";
         }
     }
 }
